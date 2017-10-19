@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "Marco Scabbiolo",
+      "authorEmail": "scabbiolo.marco@gmail.com",
+      "authorUrl": ""
+    }
+  }
+}
