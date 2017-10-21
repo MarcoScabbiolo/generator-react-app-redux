@@ -17,10 +17,7 @@ function runGenerator(prompts = {}, options = {}) {
 
 function cleanDirectory() {
   return new Promise((res, rej) => {
-    helpers.testDirectory(
-      path.join(__dirname, './temp'),
-      err => (err ? rej(err) : res())
-    );
+    helpers.testDirectory(process.cwd(), err => (err ? rej(err) : res()));
   });
 }
 
@@ -69,7 +66,33 @@ describe('generator-react-app-redux:app', () => {
     cleanDirectory();
   });
 
-  describe('bootstrap included', () => {
-    test('generator completes', () => {});
+  describe('react-bootstrap included', () => {
+    test('generator completes', runGenerator.bind(null, { boostrap: true }));
+
+    const pkgPromise = fs.readJson('package.json');
+    test.skip('includes boostrap', () =>
+      pkgPromise.then(pkg => pkg.dependencies.should.have.key('react-bootstrap')));
+
+    cleanDirectory();
+  });
+
+  describe('redux-thunk excluded', () => {
+    test('generator completes', runGenerator.bind(null, { thunk: false }));
+
+    const pkgPromise = fs.readJson('package.json');
+    test.skip('excludes redux-thunk', () =>
+      pkgPromise.then(pkg => pkg.dependencies.should.not.have.key('redux-thunk')));
+
+    cleanDirectory();
+  });
+
+  describe('redux-form included', () => {
+    test('generator completes', runGenerator.bind(null, { form: true }));
+
+    const pkgPromise = fs.readJson('package.json');
+    test.skip('includes redux-form', () =>
+      pkgPromise.then(pkg => pkg.dependencies.sholud.have.key('redux-form')));
+
+    cleanDirectory();
   });
 });
