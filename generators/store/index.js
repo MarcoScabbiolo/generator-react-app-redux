@@ -8,9 +8,8 @@ const sharedPrompts = require('../prompts');
 const esprima = require('esprima');
 const escodegen = require('escodegen');
 const astUtils = require('../astUtils');
-const pathing = require('../pathing');
 
-const shared = ['thunk', 'path'];
+const shared = ['thunk', 'path', 'form'];
 
 module.exports = class extends Generator {
   constructor(args, options) {
@@ -53,9 +52,29 @@ module.exports = class extends Generator {
       this.props = extend(this.props, props);
     });
   }
-  writing() {
-    let ast = esprima.parseModule(this.fs.read(this.templatePath('store.js'))),
-      pathAndName = this.props.path + this.props.name;
+  _writeRootReducer() {
+    let ast = esprima.parseModule(this.fs.read(this.templatePath('rootReducer.js')));
+    let pathAndName = this.props.path + this.props.name;
+
+    // Import redux-form if included
+    if (this.props.form) {
+      ast = astUtils.newImport(
+        ast,
+        astUtils.importDeclaration('redux-form', [
+          astUtils.importSpecifier('form', 'reducer')
+        ])
+      );
+    }
+
+    // Write the root reducer file
+    this.fs.write(
+      this.destinationPath(`reducer/${pathAndName}.js`),
+      escodegen.generate(ast)
+    );
+  }
+  _writeStore() {
+    let ast = esprima.parseModule(this.fs.read(this.templatePath('store.js')));
+    let pathAndName = this.props.path + this.props.name;
 
     // Import the reducer
     ast = astUtils.newImport(
@@ -122,5 +141,9 @@ module.exports = class extends Generator {
       this.destinationPath(`stores/${pathAndName}.js`),
       escodegen.generate(ast)
     );
+  }
+  writing() {
+    this._writeRootReducer();
+    this._writeStore();
   }
 };

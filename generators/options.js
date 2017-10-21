@@ -37,8 +37,8 @@ options.include = function(config, param, log) {
   }
 
   if (_.isArray(param)) {
-    var allOptions = options.getAll(),
-      included = allOptions.filter(option => param.includes(option[0]));
+    var allOptions = options.getAll();
+    var included = allOptions.filter(option => param.includes(option[0]));
 
     included.forEach(option => config(option[0], option[1]));
 
@@ -49,7 +49,7 @@ options.include = function(config, param, log) {
       log(chalk.yellow(`Options ${notIncluded} do not exist and could not be included`));
     }
   } else if (_.isString(param)) {
-    if (options.hasOwnProperty(param)) {
+    if (options[param]) {
       config(param, options[param]);
     } else {
       throw new Error(`Shared option ${param} does not exist`);

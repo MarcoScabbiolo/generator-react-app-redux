@@ -8,7 +8,6 @@ const sharedPrompts = require('../prompts');
 const esprima = require('esprima');
 const escodegen = require('escodegen');
 const astUtils = require('../astUtils');
-const pathing = require('../pathing');
 
 const shared = ['bootstrap', 'thunk', 'path'];
 

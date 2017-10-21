@@ -5,10 +5,6 @@ const extend = require('deep-extend');
 const _ = require('lodash');
 const sharedOptions = require('../options');
 const sharedPrompts = require('../prompts');
-const esprima = require('esprima');
-const escodegen = require('escodegen');
-const astUtils = require('../astUtils');
-const pathing = require('../pathing');
 
 const shared = ['path'];
 

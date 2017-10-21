@@ -39,7 +39,8 @@ module.exports = class extends Generator {
   default() {
     this.composeWith(require.resolve('generator-node/generators/app'), {
       boilerplate: false,
-      skipInstall: this.options.skipInstall
+      skipInstall: this.options.skipInstall,
+      license: this.options.license
     });
     this.composeWith(require.resolve('../entry'), {
       name: 'index',
@@ -58,7 +59,8 @@ module.exports = class extends Generator {
     this.fs.writeJSON(destinationPath || original, originalParsed);
   }
   writing() {
-    this.fs.copy(this.templatePath('static/**/*'), this.destinationRoot());
+    this.fs.copy(this.templatePath('static/**'), this.destinationRoot());
+    this.fs.copy(this.templatePath('static/**/.*'), this.destinationRoot());
 
     this._extendJSON(
       this.destinationPath('package.json'),
