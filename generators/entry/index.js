@@ -3,6 +3,7 @@ const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const extend = require('deep-extend');
 const _ = require('lodash');
+const path = require('path');
 const sharedOptions = require('../options');
 const sharedPrompts = require('../prompts');
 const esprima = require('esprima');
@@ -39,8 +40,20 @@ module.exports = class extends Generator {
       this.props.path = args[1];
     }
   }
+  _resolvedPath() {
+    return path.join(this.props.path, this.props.name);
+  }
+  _jsEntryPath() {
+    return this.props.name + '.js';
+  }
   initializing() {
     this.props = Object.assign({}, this.options, this.props);
+
+    this.composeWith(require.resolve('../store'), {
+      name: this.props.name,
+      thunk: this.props.thunk,
+      path: this.props.path
+    });
   }
   prompting() {
     this.log('');
@@ -57,14 +70,19 @@ module.exports = class extends Generator {
       ].concat(sharedPrompts.get(this.props, shared))
     ).then(props => {
       this.props = extend(this.props, props);
+      this.validating();
     });
   }
-  default() {
-    this.composeWith(require.resolve('../store'), {
-      name: this.props.name,
-      thunk: this.props.thunk,
-      path: this.props.path
-    });
+  validating() {
+    if (this.fs.exists(this.templatePath(this._jsEntryPath()))) {
+      this.log('');
+      this.log(
+        chalk.yellow('Entry ') +
+          chalk.green(this.props.name) +
+          chalk.yellow(' aldready exists, you cannot override an entry')
+      );
+      process.exit();
+    }
   }
   _writeJSEntry() {
     let jsEntry = this.fs.read(this.templatePath('entry.js'));
@@ -73,17 +91,19 @@ module.exports = class extends Generator {
     let splittedJsEntry = jsEntry.split('// #__esprima-breakpoint__#');
 
     let ast = esprima.parseModule(splittedJsEntry[0]);
-    let pathAndName = this.props.path + this.props.name;
 
     // Import the main container
     ast = astUtils.newImport(
       ast,
-      astUtils.importDefaultDeclaration('Main', `containers/${pathAndName}`)
+      astUtils.importDefaultDeclaration('Main', `containers/${this._resolvedPath()}`)
     );
     // Import the store
     ast = astUtils.newImport(
       ast,
-      astUtils.importDefaultDeclaration('configureStore', `stores/${pathAndName}`)
+      astUtils.importDefaultDeclaration(
+        'configureStore',
+        `stores/${this._resolvedPath()}`
+      )
     );
 
     // Set the main container path variable to be used by HMR
@@ -99,12 +119,13 @@ module.exports = class extends Generator {
       );
     }
 
-    mainContainerPathVariable.declarations[0].init.value = 'containers/' + pathAndName;
-    mainContainerPathVariable.declarations[0].init.raw = `'containers/${pathAndName}'`;
+    mainContainerPathVariable.declarations[0].init.value =
+      'containers/' + this._resolvedPath();
+    mainContainerPathVariable.declarations[0].init.raw = `'containers/${this._resolvedPath()}'`;
 
     // Write the ast and the untouched part of the file
     this.fs.write(
-      this.destinationPath(this.props.name + '.js'),
+      this.destinationPath(this._jsEntryPath()),
       escodegen.generate(ast) + splittedJsEntry[1]
     );
   }

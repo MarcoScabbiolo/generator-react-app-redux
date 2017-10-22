@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "protocol": "auto",
+      "runtimeArgs": [
+        "--debug-brk",
+        "${workspaceRoot}/node_modules/.bin/jest",
+        "-i"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

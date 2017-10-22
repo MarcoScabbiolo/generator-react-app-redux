@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const pathing = require('./pathing');
 
 const prompts = [
   {
@@ -22,8 +21,7 @@ const prompts = [
     name: 'path',
     message:
       'Where do you want to place the new entry? Insert a path relative to the src directory',
-    when: props => !_.isString(props.path),
-    filter: pathing.normalize
+    when: props => !_.isString(props.path)
   },
   {
     name: 'form',

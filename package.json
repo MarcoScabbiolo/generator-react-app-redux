@@ -45,13 +45,14 @@
     "yosay": "^2.0.1"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testMatch": ["**/__tests__/*.js?(x)"]
   },
   "scripts": {
     "prepublish": "nsp check",
     "pretest": "eslint . --fix",
     "precommit": "lint-staged",
-    "test": "jest"
+    "test": "jest --verbose"
   },
   "lint-staged": {
     "*.js": ["eslint --fix", "git add"],

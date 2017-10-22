@@ -57,6 +57,24 @@ function stringLiteralProperty(name, value) {
   };
 }
 
+function shorthandProperty(name) {
+  return {
+    type: 'Property',
+    key: {
+      type: 'Identifier',
+      name: name
+    },
+    computed: false,
+    value: {
+      type: 'Identifier',
+      name: name
+    },
+    kind: 'init',
+    method: false,
+    shorthand: true
+  };
+}
+
 function callExpression(func, args) {
   return {
     type: 'CallExpression',
@@ -92,5 +110,6 @@ module.exports = {
   stringLiteralProperty,
   newImport,
   importDeclaration,
-  importSpecifier
+  importSpecifier,
+  shorthandProperty
 };

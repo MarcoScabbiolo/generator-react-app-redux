@@ -3,6 +3,7 @@ const Generator = require('yeoman-generator');
 const chalk = require('chalk');
 const extend = require('deep-extend');
 const _ = require('lodash');
+const path = require('path');
 const sharedOptions = require('../options');
 const sharedPrompts = require('../prompts');
 const esprima = require('esprima');
@@ -32,6 +33,9 @@ module.exports = class extends Generator {
       this.props.path = args[1];
     }
   }
+  _resolvedPath() {
+    return path.join(this.props.path, this.props.name);
+  }
   initializing() {
     this.props = Object.assign({}, this.options, this.props);
   }
@@ -54,7 +58,10 @@ module.exports = class extends Generator {
   }
   _writeRootReducer() {
     let ast = esprima.parseModule(this.fs.read(this.templatePath('rootReducer.js')));
-    let pathAndName = this.props.path + this.props.name;
+
+    // Find the object containing the reducers to be combined
+    let toCombine = astUtils.findSingleVariableDeclaration(ast, 'const', 'reducer')
+      .declarations[0].init.arguments[0].properties;
 
     // Import redux-form if included
     if (this.props.form) {
@@ -64,22 +71,23 @@ module.exports = class extends Generator {
           astUtils.importSpecifier('form', 'reducer')
         ])
       );
+
+      toCombine.push(astUtils.shorthandProperty('form'));
     }
 
     // Write the root reducer file
     this.fs.write(
-      this.destinationPath(`reducer/${pathAndName}.js`),
+      this.destinationPath(`reducer/${this._resolvedPath()}.js`),
       escodegen.generate(ast)
     );
   }
   _writeStore() {
     let ast = esprima.parseModule(this.fs.read(this.templatePath('store.js')));
-    let pathAndName = this.props.path + this.props.name;
 
     // Import the reducer
     ast = astUtils.newImport(
       ast,
-      astUtils.importDefaultDeclaration('mainReducer', `reducers/${pathAndName}`)
+      astUtils.importDefaultDeclaration('mainReducer', `reducers/${this._resolvedPath()}`)
     );
 
     // Import redux-thunk if included
@@ -103,8 +111,9 @@ module.exports = class extends Generator {
       );
     }
 
-    mainReducerPathVariable.declarations[0].init.value = 'reducers/' + pathAndName;
-    mainReducerPathVariable.declarations[0].init.raw = `'reducers/${pathAndName}'`;
+    mainReducerPathVariable.declarations[0].init.value =
+      'reducers/' + this._resolvedPath();
+    mainReducerPathVariable.declarations[0].init.raw = `'reducers/${this._resolvedPath()}'`;
 
     // Find the middleware array
     let middlewareVariable = astUtils.findSingleVariableDeclaration(
@@ -138,7 +147,7 @@ module.exports = class extends Generator {
 
     // Write the new store file
     this.fs.write(
-      this.destinationPath(`stores/${pathAndName}.js`),
+      this.destinationPath(`stores/${this._resolvedPath()}.js`),
       escodegen.generate(ast)
     );
   }
