@@ -1,63 +1,61 @@
 'use strict';
-const Generator = require('yeoman-generator');
-const chalk = require('chalk');
-const extend = require('deep-extend');
-const _ = require('lodash');
-const path = require('path');
-const sharedOptions = require('../options');
-const sharedPrompts = require('../prompts');
+const ReactReduxGenerator = require('../ReactReduxGenerator');
 const esprima = require('esprima');
-const escodegen = require('escodegen');
 const astUtils = require('../astUtils');
 
-const shared = ['thunk', 'path', 'form'];
+const shared = ['thunk', 'path', 'form', 'normalizr'];
+const prompts = [
+  {
+    name: 'name',
+    message: 'What will be the name of the new store?',
+    when: function() {
+      return !this.props.name;
+    }
+  }
+];
 
-module.exports = class extends Generator {
+module.exports = class extends ReactReduxGenerator {
   constructor(args, options) {
-    super(args, options);
+    super(args, options, {
+      shared,
+      prompts,
+      generatorName: 'Store'
+    });
 
     this.option('name', {
       type: String,
       required: false,
       desc: 'The name of the store'
     });
-
-    sharedOptions.include(this.option.bind(this), shared, this.log.bind(this));
-
-    this.props = {};
-
-    if (_.isString(args)) {
-      this.props.name = args;
-    } else if (_.isArray(args) && args.length) {
-      this.props.name = args[0];
-      this.props.path = args[1];
-    }
-  }
-  _resolvedPath() {
-    return path.join(this.props.path, this.props.name);
   }
   initializing() {
-    this.props = Object.assign({}, this.options, this.props);
+    return this._initializing();
   }
   prompting() {
-    this.log('');
-    this.log(chalk.green('Store') + ' generator');
-    this.log('');
+    return this._prompting();
+  }
+  _writeEntitiesReducer() {
+    let ast = esprima.parseModule(this.fs.read(this.templatePath('entities.js')));
 
-    return this.prompt(
-      [
-        {
-          name: 'name',
-          message: 'What will be the name of the new store?',
-          when: !this.props.name
-        }
-      ].concat(sharedPrompts.get(this.props, shared))
-    ).then(props => {
-      this.props = extend(this.props, props);
-    });
+    // Import normalizr if included
+    if (this.props.normalizr) {
+      ast = astUtils.newImport(
+        ast,
+        astUtils.importDeclaration('normalizr', [
+          astUtils.importSpecifier('normalize'),
+          astUtils.importSpecifier('schema')
+        ])
+      );
+    }
+
+    // Write the entities reducer file
+    this.fs.write(
+      this.destinationPath(this._entitiesReducerFilePath),
+      astUtils.generate(ast)
+    );
   }
   _writeRootReducer() {
-    let ast = esprima.parseModule(this.fs.read(this.templatePath('rootReducer.js')));
+    let ast = esprima.parseModule(this.fs.read(this.templatePath('root.js')));
 
     // Find the object containing the reducers to be combined
     let toCombine = astUtils.findSingleVariableDeclaration(ast, 'const', 'reducer')
@@ -75,10 +73,24 @@ module.exports = class extends Generator {
       toCombine.push(astUtils.shorthandProperty('form'));
     }
 
+    // Import sections reducer
+    ast = astUtils.newImport(
+      ast,
+      astUtils.importDefaultDeclaration('sections', this._sectionsReducerPath)
+    );
+    toCombine.push(astUtils.shorthandProperty('sections'));
+
+    // Import entities reducer
+    ast = astUtils.newImport(
+      ast,
+      astUtils.importDefaultDeclaration('entities', this._entitiesReducerPath)
+    );
+    toCombine.push(astUtils.shorthandProperty('entities'));
+
     // Write the root reducer file
     this.fs.write(
-      this.destinationPath(`reducer/${this._resolvedPath()}.js`),
-      escodegen.generate(ast)
+      this.destinationPath(this._rootReducerFilePath),
+      astUtils.generate(ast)
     );
   }
   _writeStore() {
@@ -87,7 +99,7 @@ module.exports = class extends Generator {
     // Import the reducer
     ast = astUtils.newImport(
       ast,
-      astUtils.importDefaultDeclaration('mainReducer', `reducers/${this._resolvedPath()}`)
+      astUtils.importDefaultDeclaration('mainReducer', this._rootReducerPath)
     );
 
     // Import redux-thunk if included
@@ -111,9 +123,8 @@ module.exports = class extends Generator {
       );
     }
 
-    mainReducerPathVariable.declarations[0].init.value =
-      'reducers/' + this._resolvedPath();
-    mainReducerPathVariable.declarations[0].init.raw = `'reducers/${this._resolvedPath()}'`;
+    mainReducerPathVariable.declarations[0].init.value = this._rootReducerPath;
+    mainReducerPathVariable.declarations[0].init.raw = `'${this.rootReducerPath}'`;
 
     // Find the middleware array
     let middlewareVariable = astUtils.findSingleVariableDeclaration(
@@ -146,12 +157,16 @@ module.exports = class extends Generator {
     }
 
     // Write the new store file
-    this.fs.write(
-      this.destinationPath(`stores/${this._resolvedPath()}.js`),
-      escodegen.generate(ast)
-    );
+    this.fs.write(this.destinationPath(this._storeFilePath), astUtils.generate(ast));
   }
   writing() {
+    // Copy sections reducer
+    this.fs.copy(
+      this.templatePath('static/sections.js'),
+      this.destinationPath(this._sectionsReducerFilePath)
+    );
+
+    this._writeEntitiesReducer();
     this._writeRootReducer();
     this._writeStore();
   }

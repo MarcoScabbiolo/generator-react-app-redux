@@ -30,6 +30,14 @@ const prompts = [
     default: true,
     store: true,
     when: props => !_.isBoolean(props.form)
+  },
+  {
+    name: 'normalizr',
+    message: 'Use normalizr?',
+    type: 'confirm',
+    default: false,
+    store: true,
+    when: props => !_.isBoolean(props.normalizr)
   }
 ];
 

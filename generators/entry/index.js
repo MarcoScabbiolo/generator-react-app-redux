@@ -1,25 +1,27 @@
 'use strict';
-const Generator = require('yeoman-generator');
+const ReactReduxGenerator = require('../ReactReduxGenerator');
+const environment = require('./Environment');
 const chalk = require('chalk');
-const extend = require('deep-extend');
-const _ = require('lodash');
-const path = require('path');
-const sharedOptions = require('../options');
-const sharedPrompts = require('../prompts');
 const esprima = require('esprima');
-const escodegen = require('escodegen');
 const astUtils = require('../astUtils');
 
-const shared = ['bootstrap', 'thunk', 'path'];
+const shared = ['bootstrap', 'thunk', 'path', 'normalizr'];
+const prompts = [
+  {
+    name: 'name',
+    message: 'What will be the name of the new entry?',
+    when: function() {
+      return !this.props.name;
+    }
+  }
+];
 
-module.exports = class extends Generator {
+module.exports = class extends environment(ReactReduxGenerator) {
   constructor(args, options) {
-    super(args, options);
-
-    this.option('name', {
-      type: String,
-      required: false,
-      desc: 'The name of the entry'
+    super(args, options, {
+      shared,
+      prompts,
+      generatorName: 'Entry'
     });
 
     this.option('skipEntryDirectory', {
@@ -28,53 +30,33 @@ module.exports = class extends Generator {
       default: false,
       desc: 'Do not create a directory for the entry and template files'
     });
-
-    sharedOptions.include(this.option.bind(this), shared, this.log.bind(this));
-
-    this.props = {};
-
-    if (_.isString(args)) {
-      this.props.name = args;
-    } else if (_.isArray(args) && args.length) {
-      this.props.name = args[0];
-      this.props.path = args[1];
-    }
   }
-  _resolvedPath() {
-    return path.join(this.props.path, this.props.name);
-  }
-  _jsEntryPath() {
-    return this.props.name + '.js';
-  }
+
   initializing() {
-    this.props = Object.assign({}, this.options, this.props);
+    this._initializing();
 
     this.composeWith(require.resolve('../store'), {
       name: this.props.name,
       thunk: this.props.thunk,
+      normalizr: this.props.normalizr,
       path: this.props.path
+    });
+
+    let actions = { app: 'app' };
+    actions[this.props.name] = this._actionsPath;
+
+    this.composeWith(require.resolve('../reducer'), {
+      name: this.props.name,
+      path: this.props.path,
+      type: 'section',
+      actions
     });
   }
   prompting() {
-    this.log('');
-    this.log(chalk.green('Entry') + ' generator');
-    this.log('');
-
-    return this.prompt(
-      [
-        {
-          name: 'name',
-          message: 'What will be the name of the new entry?',
-          when: !this.props.name
-        }
-      ].concat(sharedPrompts.get(this.props, shared))
-    ).then(props => {
-      this.props = extend(this.props, props);
-      this.validating();
-    });
+    return this._prompting();
   }
   validating() {
-    if (this.fs.exists(this.templatePath(this._jsEntryPath()))) {
+    if (this.fs.exists(this.destinationPath(this._jsEntryFilePath))) {
       this.log('');
       this.log(
         chalk.yellow('Entry ') +
@@ -95,15 +77,12 @@ module.exports = class extends Generator {
     // Import the main container
     ast = astUtils.newImport(
       ast,
-      astUtils.importDefaultDeclaration('Main', `containers/${this._resolvedPath()}`)
+      astUtils.importDefaultDeclaration('Main', this._defaultContainerPath)
     );
     // Import the store
     ast = astUtils.newImport(
       ast,
-      astUtils.importDefaultDeclaration(
-        'configureStore',
-        `stores/${this._resolvedPath()}`
-      )
+      astUtils.importDefaultDeclaration('configureStore', this._storePath)
     );
 
     // Set the main container path variable to be used by HMR
@@ -119,23 +98,20 @@ module.exports = class extends Generator {
       );
     }
 
-    mainContainerPathVariable.declarations[0].init.value =
-      'containers/' + this._resolvedPath();
-    mainContainerPathVariable.declarations[0].init.raw = `'containers/${this._resolvedPath()}'`;
+    mainContainerPathVariable.declarations[0].init.value = this._defaultContainerPath;
+    mainContainerPathVariable.declarations[0].init.raw = `'${this
+      ._defaultContainerPath}'`;
 
     // Write the ast and the untouched part of the file
     this.fs.write(
-      this.destinationPath(this._jsEntryPath()),
-      escodegen.generate(ast) + splittedJsEntry[1]
+      this.destinationPath(this._jsEntryFilePath),
+      astUtils.generate(ast) + splittedJsEntry[1]
     );
   }
   _writeHTMLTemplate() {
     this.fs.copy(
       this.templatePath('static/index.ejs'),
-      this.destinationPath(
-        this.props.path +
-          (this.props.skipEntryDirectory ? 'index.ejs' : `${this.props.name}/index.ejs`)
-      )
+      this.destinationPath(this._htmlEntryFilePath)
     );
   }
   _entriesFileIncosistentError(details) {
@@ -189,6 +165,6 @@ module.exports = class extends Generator {
       astUtils.stringLiteralProperty(this.props.name, this.props.name + '.js')
     );
 
-    this.fs.write(this.destinationPath('webpack/entries.js'), escodegen.generate(ast));
+    this.fs.write(this.destinationPath('webpack/entries.js'), astUtils.generate(ast));
   }
 };

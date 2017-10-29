@@ -22,7 +22,7 @@ ReactDOM.render(
 if (module.hot) {
   module.hot.accept(['containers/App', mainContainerPath], () => {
     const NextApp = require('containers/App').default; // eslint-disable-line global-require
-    const MainContainer = require(mainContainerPath).default: // eslint-disable-line global-require
+    const MainContainer = require(mainContainerPath).default; // eslint-disable-line global-require
 
     ReactDOM.render(
       <AppContainer>

@@ -15,7 +15,8 @@ describe('generator-react-app-redux:app', () => {
       .withOptions({ license: false })
       .withPrompts({
         bootstrap: true,
-        form: true
+        form: true,
+        normalizr: true
       })
       .withGenerators(dummyDependencies));
 
@@ -53,6 +54,7 @@ describe('generator-react-app-redux:app', () => {
       name: 'index',
       bootstrap: true,
       form: true,
+      normalizr: true,
       path: '',
       skipEntryDirectory: true
     },

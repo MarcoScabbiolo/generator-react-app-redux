@@ -1,53 +1,117 @@
 'use strict';
-const Generator = require('yeoman-generator');
-const chalk = require('chalk');
-const extend = require('deep-extend');
+const ReactReduxGenerator = require('../ReactReduxGenerator');
 const _ = require('lodash');
-const sharedOptions = require('../options');
-const sharedPrompts = require('../prompts');
+const esprima = require('esprima');
+const astUtils = require('../astUtils');
+const environment = require('./Environment');
 
 const shared = ['path'];
-
-module.exports = class extends Generator {
-  constructor(args, options) {
-    super(args, options);
-
-    this.option('name', {
-      type: String,
-      required: false,
-      desc: 'The name of the reducer'
-    });
-
-    sharedOptions.include(this.option.bind(this), shared, this.log.bind(this));
-
-    this.props = {};
-
-    if (_.isString(args)) {
-      this.props.name = args;
-    } else if (_.isArray(args) && args.length) {
-      this.props.name = args[0];
-      this.props.path = args[1];
+const prompts = [
+  {
+    name: 'name',
+    message: 'What will be the name of the new reducer?',
+    when: function() {
+      return !this.props.name;
+    }
+  },
+  {
+    name: 'type',
+    message: 'What type of reducer do you need?',
+    type: 'list',
+    choices: [
+      {
+        value: 'simple',
+        name: 'Simple reducer'
+      },
+      {
+        value: 'section',
+        name: 'New section'
+      },
+      {
+        value: 'compositon',
+        name: 'Combination of other reducers'
+      }
+    ],
+    default: 'simple',
+    when: function() {
+      return !this.props.type;
     }
   }
-  initializing() {
-    this.props = Object.assign({}, this.options, this.props);
-  }
-  prompting() {
-    this.log('');
-    this.log(chalk.green('Reducer') + ' generator');
-    this.log('');
+];
 
-    return this.prompt(
-      [
-        {
-          name: 'name',
-          message: 'What will be the name of the new reducer?',
-          when: !this.props.name
-        }
-      ].concat(sharedPrompts.get(this.props, shared))
-    ).then(props => {
-      this.props = extend(this.props, props);
+module.exports = class extends environment(ReactReduxGenerator) {
+  constructor(args, options) {
+    super(args, options, {
+      shared,
+      prompts,
+      generatorName: 'Reducer'
+    });
+
+    this.option('type', {
+      type: String,
+      required: false,
+      desc: 'The type of reducer'
+    });
+    this.option('actions', {
+      type: Object,
+      required: false,
+      desc:
+        'Object of actions to import. The key is the local identifier and the value is the path to the file'
+    });
+    this.option('reducers', {
+      type: Object,
+      required: false,
+      desc:
+        'Object of reducers to import. The key is the local identifier and the key of the reducer in the combination and the value is the path to the file'
     });
   }
-  writing() {}
+  initializing() {
+    return this._initializing();
+  }
+  prompting() {
+    return this._prompting();
+  }
+  get _templateContents() {
+    return this.fs.read(this.templatePath(`${this.props.type}.js`));
+  }
+  writing() {
+    let ast;
+    let splittedReducer;
+
+    if (this.props.type === 'section') {
+      // A breakpoint is inserted in the template code to avoid issues with the ... operator in esprima
+      splittedReducer = this._templateContents.split('// #__esprima-breakpoint__#');
+      ast = esprima.parseModule(splittedReducer[0]);
+    } else {
+      ast = esprima.parseModule(this._templateContents);
+    }
+
+    // Import all the included actions
+    if (this.props.type !== 'composition' && this.props.actions) {
+      _.forIn(this.props.actions, (filePath, name) => {
+        ast = astUtils.newImport(
+          ast,
+          astUtils.importNamespaceDeclaration(name, filePath)
+        );
+      });
+    }
+
+    // Combine reducers
+    if (this.props.type === 'composition' && this.props.reducers) {
+      let combination = astUtils.findSingleVariableDeclaration(ast, 'const', 'reducer')
+        .declarations[0].init.arguments[0].properties;
+
+      _.forIn(this.props.reducers, (filePath, name) => {
+        // Import the reducer
+        ast = astUtils.newImport(ast, astUtils.importDefaultDeclaration(name, filePath));
+        // Combine it
+        combination.push(astUtils.shorthandProperty(name));
+      });
+    }
+
+    this.fs.write(
+      this.destinationPath(this._reducerToCreateFilePath),
+      astUtils.generate(ast) + (this.props.type === 'section' ? splittedReducer[1] : '')
+    );
+  }
 };

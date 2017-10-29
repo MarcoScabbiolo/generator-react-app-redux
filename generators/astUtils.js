@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const escodegen = require('escodegen');
 
 function importDefaultDeclaration(identifier, source) {
   return importDeclaration(source, [
@@ -7,6 +8,18 @@ function importDefaultDeclaration(identifier, source) {
       local: {
         type: 'Identifier',
         name: identifier
+      }
+    }
+  ]);
+}
+
+function importNamespaceDeclaration(namespace, source) {
+  return importDeclaration(source, [
+    {
+      type: 'ImportNamespaceSpecifier',
+      local: {
+        type: 'Identifier',
+        name: namespace
       }
     }
   ]);
@@ -103,8 +116,20 @@ function findSingleVariableDeclaration(ast, kind, name) {
   );
 }
 
+function generate(ast) {
+  return escodegen.generate(ast, {
+    format: {
+      indent: {
+        style: '  '
+      }
+    }
+  });
+}
+
 module.exports = {
+  generate,
   importDefaultDeclaration,
+  importNamespaceDeclaration,
   findSingleVariableDeclaration,
   callExpression,
   stringLiteralProperty,

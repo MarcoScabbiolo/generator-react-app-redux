@@ -2,10 +2,14 @@
 const path = require('path');
 const assert = require('yeoman-assert');
 const helpers = require('yeoman-test');
+const testUtils = require('../_utils/testUtils');
+const environment = require('../../generators/ReactReduxEnvironment');
 require('should');
 
-const formImportStatement = "import { reducer as form } from 'redux-form';";
-const thunkImportStatement = "import thunk from 'redux-thunk'";
+const normalizrImportStatement = `import {
+  normalize,
+  schema
+} from 'normalizr';`;
 
 function testSuite(
   options = {
@@ -13,21 +17,17 @@ function testSuite(
     prompts: {
       form: true,
       thunk: true,
+      normalizr: true,
       name: 'test',
       path: 'generator_tests'
     },
     options: {}
   }
 ) {
-  describe('generator-react-app-redux:store', () => {
-    const formEnabled = options.prompts.form || options.options.form;
-    const thunkEnabled = options.prompts.thunk || options.options.thunk;
-    const nameProp = options.prompts.name || options.options.name;
-    const pathProp = options.prompts.path || options.options.path;
-    const resolvedPath = path.join(pathProp, nameProp);
-    const rootReducerFilePath = `reducer/${resolvedPath}.js`;
-    const storeFilePath = `stores/${resolvedPath}.js`;
+  var generator = new (environment())();
+  generator.forceConfiguration(options.options, options.prompts);
 
+  describe('generator-react-app-redux:store', () => {
     if (options.runGenerator) {
       test('generator completes', () =>
         helpers
@@ -37,34 +37,45 @@ function testSuite(
     }
 
     test('creates files', () => {
-      assert.file([rootReducerFilePath, storeFilePath]);
+      assert.file([
+        generator._rootReducerFilePath,
+        generator._storeFilePath,
+        generator._sectionsReducerFilePath,
+        generator._entitiesReducerFilePath
+      ]);
     });
 
     describe('file contents', () => {
-      if (formEnabled) {
-        test('imports redux-form', () => {
-          assert.fileContent(rootReducerFilePath, formImportStatement);
-        });
-      } else {
-        test('does not import redux-form', () => {
-          assert.noFileContent(rootReducerFilePath, formImportStatement);
-        });
-      }
+      testUtils.testFileContentsByProp({
+        testTrue: 'imports redux-form',
+        testFalse: 'does not import redux-form',
+        prop: generator.props.form,
+        file: generator._rootReducerFilePath,
+        content: "import { reducer as form } from 'redux-form';"
+      });
+
       test('imports reducer in store', () => {
         assert.fileContent(
-          storeFilePath,
-          `import mainReducer from 'reducers/${resolvedPath}`
+          generator._storeFilePath,
+          `import mainReducer from '${generator._rootReducerPath}'`
         );
       });
-      if (thunkEnabled) {
-        test('imports redux-thunk', () => {
-          assert.fileContent(storeFilePath, thunkImportStatement);
-        });
-      } else {
-        test('does not import redux-thunk', () => {
-          assert.noFileContent(storeFilePath, thunkImportStatement);
-        });
-      }
+
+      testUtils.testFileContentsByProp({
+        testTrue: 'imports redux-thunk',
+        testFalse: 'does not import redux-thunk',
+        prop: generator.props.thunk,
+        file: generator._storeFilePath,
+        content: "import thunk from 'redux-thunk';"
+      });
+
+      testUtils.testFileContentsByProp({
+        testTrue: 'imports normalizr',
+        testFalse: 'does not import normalizr',
+        prop: generator.props.normalizr,
+        file: generator._entitiesReducerFilePath,
+        content: normalizrImportStatement
+      });
     });
   });
 }

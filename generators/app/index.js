@@ -5,7 +5,7 @@ const extend = require('deep-extend');
 const sharedOptions = require('../options');
 const sharedPrompts = require('../prompts');
 
-const shared = ['bootstrap', 'thunk', 'form'];
+const shared = ['bootstrap', 'thunk', 'form', 'normalizr'];
 
 module.exports = class extends Generator {
   constructor(args, options) {
@@ -24,6 +24,7 @@ module.exports = class extends Generator {
       name: 'index',
       bootstrap: this.props.bootstrap,
       thunk: this.props.thunk,
+      normalizr: this.props.normalizr,
       path: '',
       skipEntryDirectory: true
     });

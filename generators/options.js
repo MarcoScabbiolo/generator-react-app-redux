@@ -22,6 +22,11 @@ const options = {
     type: Boolean,
     required: false,
     desc: 'Use redux-form'
+  },
+  normalizr: {
+    type: Boolean,
+    required: false,
+    desc: 'Use normalizr'
   }
 };
 
