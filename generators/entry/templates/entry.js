@@ -6,7 +6,6 @@ import App from 'containers/App';
 
 const mainContainerPath = '';
 const store = configureStore();
-// #__esprima-breakpoint__#
 
 ReactDOM.render(
   <AppContainer>

@@ -2,9 +2,11 @@
 const path = require('path');
 const assert = require('yeoman-assert');
 const helpers = require('yeoman-test');
-const esprima = require('esprima');
+const astUtils = require('../../generators/astUtils');
 const fs = require('fs-extra');
-const store = require('../store/test.js');
+const store = require('../store/test');
+const reducer = require('../reducer/test');
+const component = require('../component/test');
 const reactReduxEnvironment = require('../../generators/ReactReduxEnvironment');
 const environment = require('../../generators/entry/Environment');
 require('should');
@@ -17,12 +19,12 @@ function testSuite(
       bootstrap: true,
       thunk: true,
       form: true,
-      normalizr: true,
-      name: 'test',
-      path: 'generator_tests'
+      normalizr: true
     },
     options: {
-      skipEntryDirectory: false
+      skipEntryDirectory: false,
+      path: 'generator_tests',
+      name: 'test'
     }
   }
 ) {
@@ -60,17 +62,28 @@ function testSuite(
         );
       });
       test('adds entry', () => {
-        esprima
-          .parse(fs.readFileSync('webpack/entries.js', 'utf-8'))
-          .should.have.propertyByPath('body', 0, 'expression', 'right', 'properties')
-          .which.is.Array()
-          .and.matchAny(function(property) {
-            property.should.have.value('type', 'Property');
-            property.should.have.property('key').with.value('name', generator.props.name);
-            property.should.have
-              .property('value')
-              .with.value('value', generator._jsEntryPath);
-          });
+        if (fs.existsSync('webpack/entries.js')) {
+          astUtils
+            .parse(fs.readFileSync('webpack/entries.js', 'utf-8'))
+            .should.have.propertyByPath(
+              'program',
+              'body',
+              0,
+              'expression',
+              'right',
+              'properties'
+            )
+            .which.is.Array()
+            .and.matchAny(function(property) {
+              property.should.have.value('type', 'ObjectProperty');
+              property.should.have
+                .property('key')
+                .with.value('name', generator.props.name);
+              property.should.have
+                .property('value')
+                .with.value('value', generator._jsEntryFilePath);
+            });
+        }
       });
     });
 
@@ -80,9 +93,29 @@ function testSuite(
         form: generator.props.form,
         thunk: generator.props.thunk,
         name: generator.props.name,
-        path: generator.props.path
-      },
-      prompts: {}
+        path: generator.props.path,
+        normalizr: generator.props.normalizr
+      }
+    });
+
+    reducer({
+      runGenerator: false,
+      options: {
+        name: generator.props.name,
+        path: generator.props.path,
+        type: 'section',
+        actions: generator._relatedActions
+      }
+    });
+
+    component({
+      runGenerator: false,
+      options: {
+        bootstrap: generator.props.bootstrap,
+        name: generator.props.name,
+        path: generator.props.path,
+        type: 'section'
+      }
     });
   });
 }

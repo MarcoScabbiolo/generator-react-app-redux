@@ -1,7 +1,7 @@
 'use strict';
 const ReactReduxGenerator = require('../ReactReduxGenerator');
 const _ = require('lodash');
-const esprima = require('esprima');
+const types = require('babel-types');
 const astUtils = require('../astUtils');
 const environment = require('./Environment');
 
@@ -75,23 +75,17 @@ module.exports = class extends environment(ReactReduxGenerator) {
     return this.fs.read(this.templatePath(`${this.props.type}.js`));
   }
   writing() {
-    let ast;
-    let splittedReducer;
-
-    if (this.props.type === 'section') {
-      // A breakpoint is inserted in the template code to avoid issues with the ... operator in esprima
-      splittedReducer = this._templateContents.split('// #__esprima-breakpoint__#');
-      ast = esprima.parseModule(splittedReducer[0]);
-    } else {
-      ast = esprima.parseModule(this._templateContents);
-    }
+    let ast = astUtils.parse(this._templateContents);
 
     // Import all the included actions
     if (this.props.type !== 'composition' && this.props.actions) {
       _.forIn(this.props.actions, (filePath, name) => {
         ast = astUtils.newImport(
           ast,
-          astUtils.importNamespaceDeclaration(name, filePath)
+          types.importDeclaration(
+            [types.importNamespaceSpecifier(types.identifier(name))],
+            types.stringLiteral(filePath)
+          )
         );
       });
     }
@@ -103,7 +97,13 @@ module.exports = class extends environment(ReactReduxGenerator) {
 
       _.forIn(this.props.reducers, (filePath, name) => {
         // Import the reducer
-        ast = astUtils.newImport(ast, astUtils.importDefaultDeclaration(name, filePath));
+        ast = astUtils.newImport(
+          ast,
+          types.importDeclaration(
+            [types.importDefaultSpecifier(types.identifier(name))],
+            types.stringLiteral(filePath)
+          )
+        );
         // Combine it
         combination.push(astUtils.shorthandProperty(name));
       });
@@ -111,7 +111,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
 
     this.fs.write(
       this.destinationPath(this._reducerToCreateFilePath),
-      astUtils.generate(ast) + (this.props.type === 'section' ? splittedReducer[1] : '')
+      astUtils.generate(ast)
     );
   }
 };

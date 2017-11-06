@@ -20,14 +20,6 @@ module.exports = class extends Generator {
       skipInstall: this.options.skipInstall,
       license: this.options.license
     });
-    this.composeWith(require.resolve('../entry'), {
-      name: 'index',
-      bootstrap: this.props.bootstrap,
-      thunk: this.props.thunk,
-      normalizr: this.props.normalizr,
-      path: '',
-      skipEntryDirectory: true
-    });
   }
   prompting() {
     this.log('');
@@ -42,6 +34,15 @@ module.exports = class extends Generator {
         formsEnabled: this.props.form
       });
       this.config.save();
+
+      this.composeWith(require.resolve('../entry'), {
+        name: 'index',
+        bootstrap: this.props.bootstrap,
+        thunk: this.props.thunk,
+        normalizr: this.props.normalizr,
+        path: '',
+        skipEntryDirectory: true
+      });
     });
   }
   writing() {

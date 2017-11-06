@@ -1,6 +1,6 @@
 'use strict';
 const ReactReduxGenerator = require('../ReactReduxGenerator');
-const esprima = require('esprima');
+const types = require('babel-types');
 const astUtils = require('../astUtils');
 
 const shared = ['thunk', 'path', 'form', 'normalizr'];
@@ -35,16 +35,22 @@ module.exports = class extends ReactReduxGenerator {
     return this._prompting();
   }
   _writeEntitiesReducer() {
-    let ast = esprima.parseModule(this.fs.read(this.templatePath('entities.js')));
+    let ast = astUtils.parse(this.fs.read(this.templatePath('entities.js')));
 
     // Import normalizr if included
     if (this.props.normalizr) {
       ast = astUtils.newImport(
         ast,
-        astUtils.importDeclaration('normalizr', [
-          astUtils.importSpecifier('normalize'),
-          astUtils.importSpecifier('schema')
-        ])
+        types.importDeclaration(
+          [
+            types.importSpecifier(
+              types.identifier('normalize'),
+              types.identifier('normalize')
+            ),
+            types.importSpecifier(types.identifier('schema'), types.identifier('schema'))
+          ],
+          types.stringLiteral('normalizr')
+        )
       );
     }
 
@@ -55,7 +61,7 @@ module.exports = class extends ReactReduxGenerator {
     );
   }
   _writeRootReducer() {
-    let ast = esprima.parseModule(this.fs.read(this.templatePath('root.js')));
+    let ast = astUtils.parse(this.fs.read(this.templatePath('root.js')));
 
     // Find the object containing the reducers to be combined
     let toCombine = astUtils.findSingleVariableDeclaration(ast, 'const', 'reducer')
@@ -65,9 +71,10 @@ module.exports = class extends ReactReduxGenerator {
     if (this.props.form) {
       ast = astUtils.newImport(
         ast,
-        astUtils.importDeclaration('redux-form', [
-          astUtils.importSpecifier('form', 'reducer')
-        ])
+        types.importDeclaration(
+          [types.importSpecifier(types.identifier('form'), types.identifier('reducer'))],
+          types.stringLiteral('redux-form')
+        )
       );
 
       toCombine.push(astUtils.shorthandProperty('form'));
@@ -76,14 +83,30 @@ module.exports = class extends ReactReduxGenerator {
     // Import sections reducer
     ast = astUtils.newImport(
       ast,
-      astUtils.importDefaultDeclaration('sections', this._sectionsReducerPath)
+      types.importDeclaration(
+        [
+          types.importSpecifier(
+            types.identifier('sections'),
+            types.identifier('sections')
+          )
+        ],
+        types.stringLiteral(this._sectionsReducerPath)
+      )
     );
     toCombine.push(astUtils.shorthandProperty('sections'));
 
     // Import entities reducer
     ast = astUtils.newImport(
       ast,
-      astUtils.importDefaultDeclaration('entities', this._entitiesReducerPath)
+      types.importDeclaration(
+        [
+          types.importSpecifier(
+            types.identifier('entities'),
+            types.identifier('entities')
+          )
+        ],
+        types.stringLiteral(this._entitiesReducerPath)
+      )
     );
     toCombine.push(astUtils.shorthandProperty('entities'));
 
@@ -94,19 +117,25 @@ module.exports = class extends ReactReduxGenerator {
     );
   }
   _writeStore() {
-    let ast = esprima.parseModule(this.fs.read(this.templatePath('store.js')));
+    let ast = astUtils.parse(this.fs.read(this.templatePath('store.js')));
 
     // Import the reducer
     ast = astUtils.newImport(
       ast,
-      astUtils.importDefaultDeclaration('mainReducer', this._rootReducerPath)
+      types.importDeclaration(
+        [types.importDefaultSpecifier(types.identifier('mainReducer'))],
+        types.stringLiteral(this._rootReducerPath)
+      )
     );
 
     // Import redux-thunk if included
     if (this.props.thunk) {
       ast = astUtils.newImport(
         ast,
-        astUtils.importDefaultDeclaration('thunk', 'redux-thunk')
+        types.importDeclaration(
+          [types.importDefaultSpecifier(types.identifier('thunk'))],
+          types.stringLiteral('redux-thunk')
+        )
       );
     }
 
@@ -138,10 +167,7 @@ module.exports = class extends ReactReduxGenerator {
         'Could not find the declaration of the variable middleware in the store template'
       );
     }
-    if (
-      !middlewareVariable.declarations[0].init ||
-      middlewareVariable.declarations[0].init.type !== 'ArrayExpression'
-    ) {
+    if (!types.isArrayExpression(middlewareVariable.declarations[0].init)) {
       throw new Error(
         'The middleware variable declarations right side is not an ArrayExpression'
       );
@@ -150,8 +176,8 @@ module.exports = class extends ReactReduxGenerator {
     // Add the redux-thunk middleware if included
     if (this.props.thunk) {
       middlewareVariable.declarations[0].init.elements.push(
-        astUtils.callExpression('applyMiddleware', [
-          { type: 'Identifier', name: 'thunk' }
+        types.callExpression(types.identifier('applyMiddleware'), [
+          types.identifier('thunk')
         ])
       );
     }

@@ -21,10 +21,10 @@ module.exports = (BaseClass = DummyBaseClass) =>
       return path.join(this.props.path, this.props.name);
     }
     get _jsEntryPath() {
-      return this.props.name + '.js';
+      return path.join('src', this._resolvedPath);
     }
     get _jsEntryFilePath() {
-      return path.join('src', this._jsEntryPath);
+      return this._jsEntryPath + '.js';
     }
     get _actionsPath() {
       return path.join('actions', this._resolvedPath);

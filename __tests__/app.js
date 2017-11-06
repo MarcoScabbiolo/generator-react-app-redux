@@ -55,6 +55,7 @@ describe('generator-react-app-redux:app', () => {
       bootstrap: true,
       form: true,
       normalizr: true,
+      thunk: true,
       path: '',
       skipEntryDirectory: true
     },

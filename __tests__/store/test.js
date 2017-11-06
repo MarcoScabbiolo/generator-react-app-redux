@@ -6,13 +6,9 @@ const testUtils = require('../_utils/testUtils');
 const environment = require('../../generators/ReactReduxEnvironment');
 require('should');
 
-const normalizrImportStatement = `import {
-  normalize,
-  schema
-} from 'normalizr';`;
-
 function testSuite(
   options = {
+    skip: false,
     runGenerator: true,
     prompts: {
       form: true,
@@ -27,7 +23,7 @@ function testSuite(
   var generator = new (environment())();
   generator.forceConfiguration(options.options, options.prompts);
 
-  describe('generator-react-app-redux:store', () => {
+  (options.skip ? describe.skip : describe)('generator-react-app-redux:store', () => {
     if (options.runGenerator) {
       test('generator completes', () =>
         helpers
@@ -74,7 +70,7 @@ function testSuite(
         testFalse: 'does not import normalizr',
         prop: generator.props.normalizr,
         file: generator._entitiesReducerFilePath,
-        content: normalizrImportStatement
+        content: "import { normalize, schema } from 'normalizr';"
       });
     });
   });

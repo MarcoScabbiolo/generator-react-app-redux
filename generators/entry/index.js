@@ -2,7 +2,7 @@
 const ReactReduxGenerator = require('../ReactReduxGenerator');
 const environment = require('./Environment');
 const chalk = require('chalk');
-const esprima = require('esprima');
+const types = require('babel-types');
 const astUtils = require('../astUtils');
 
 const shared = ['bootstrap', 'thunk', 'path', 'normalizr'];
@@ -33,27 +33,31 @@ module.exports = class extends environment(ReactReduxGenerator) {
   }
 
   initializing() {
-    this._initializing();
-
-    this.composeWith(require.resolve('../store'), {
-      name: this.props.name,
-      thunk: this.props.thunk,
-      normalizr: this.props.normalizr,
-      path: this.props.path
-    });
-
-    let actions = { app: 'app' };
-    actions[this.props.name] = this._actionsPath;
-
-    this.composeWith(require.resolve('../reducer'), {
-      name: this.props.name,
-      path: this.props.path,
-      type: 'section',
-      actions
-    });
+    return this._initializing();
   }
   prompting() {
-    return this._prompting();
+    return this._prompting().then(() => {
+      this.composeWith(require.resolve('../store'), {
+        name: this.props.name,
+        thunk: this.props.thunk,
+        normalizr: this.props.normalizr,
+        path: this.props.path
+      });
+
+      this.composeWith(require.resolve('../reducer'), {
+        name: this.props.name,
+        path: this.props.path,
+        type: 'section',
+        actions: this._relatedActions
+      });
+
+      this.composeWith(require.resolve('../component'), {
+        name: this.props.name,
+        path: this.props.path,
+        container: true,
+        type: 'section'
+      });
+    });
   }
   validating() {
     if (this.fs.exists(this.destinationPath(this._jsEntryFilePath))) {
@@ -67,22 +71,23 @@ module.exports = class extends environment(ReactReduxGenerator) {
     }
   }
   _writeJSEntry() {
-    let jsEntry = this.fs.read(this.templatePath('entry.js'));
-
-    // We only parse the first to avoid issues with JSX
-    let splittedJsEntry = jsEntry.split('// #__esprima-breakpoint__#');
-
-    let ast = esprima.parseModule(splittedJsEntry[0]);
+    let ast = astUtils.parse(this.fs.read(this.templatePath('entry.js')));
 
     // Import the main container
     ast = astUtils.newImport(
       ast,
-      astUtils.importDefaultDeclaration('Main', this._defaultContainerPath)
+      types.importDeclaration(
+        [types.importDefaultSpecifier(types.identifier('Main'))],
+        types.stringLiteral(this._defaultContainerPath)
+      )
     );
     // Import the store
     ast = astUtils.newImport(
       ast,
-      astUtils.importDefaultDeclaration('configureStore', this._storePath)
+      types.importDeclaration(
+        [types.importDefaultSpecifier(types.identifier('configureStore'))],
+        types.stringLiteral(this._storePath)
+      )
     );
 
     // Set the main container path variable to be used by HMR
@@ -103,10 +108,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
       ._defaultContainerPath}'`;
 
     // Write the ast and the untouched part of the file
-    this.fs.write(
-      this.destinationPath(this._jsEntryFilePath),
-      astUtils.generate(ast) + splittedJsEntry[1]
-    );
+    this.fs.write(this.destinationPath(this._jsEntryFilePath), astUtils.generate(ast));
   }
   _writeHTMLTemplate() {
     this.fs.copy(
@@ -124,47 +126,39 @@ module.exports = class extends environment(ReactReduxGenerator) {
     this._writeJSEntry();
     this._writeHTMLTemplate();
 
-    // Add the entry into the entries file
-    let ast = esprima.parse(this.fs.read(this.destinationPath('webpack/entries.js')));
+    if (this.fs.exists(this.destinationPath('webpack/entries.js'))) {
+      // Add the entry into the entries file
+      let ast = astUtils.parse(this.fs.read(this.destinationPath('webpack/entries.js')));
 
-    // Check the consistency of the entries file so we dont break anything
-    if (ast.type !== 'Program') {
-      this._entriesFileIncosistentError('File does not contain a Program');
-    }
+      // Check the consistency of the entries file so we dont break anything
+      types.assertProgram(ast.program);
+      types.assertExpressionStatement(ast.program.body[0]);
 
-    if (ast.body[0].type !== 'ExpressionStatement') {
-      this._entriesFileIncosistentError('First statement must be an ExpressionStatement');
-    }
+      let expression = ast.program.body[0].expression;
 
-    let expression = ast.body[0].expression;
+      types.assertAssignmentExpression(expression);
+      types.assertMemberExpression(expression.left);
 
-    if (expression.type !== 'AssignmentExpression') {
-      this._entriesFileIncosistentError('Expression must be an AssignmentExpression');
-    }
+      if (
+        expression.left.object.name !== 'module' ||
+        expression.left.property.name !== 'exports'
+      ) {
+        this._entriesFileIncosistentError(
+          'Left side of the assignment must be a MemberExpression for the object module and the property exports'
+        );
+      }
 
-    if (
-      expression.left.type !== 'MemberExpression' ||
-      !expression.left.object ||
-      !expression.left.property ||
-      expression.left.object.name !== 'module' ||
-      expression.left.property.name !== 'exports'
-    ) {
-      this._entriesFileIncosistentError(
-        'Left side of the assignment must be a MemberExpression for the object module and the property exports'
+      types.assertObjectExpression(expression.right);
+
+      // Finally add the entry
+      expression.right.properties.push(
+        types.objectProperty(
+          types.identifier(this.props.name),
+          types.stringLiteral(this._jsEntryFilePath)
+        )
       );
+
+      this.fs.write(this.destinationPath('webpack/entries.js'), astUtils.generate(ast));
     }
-
-    if (expression.right.type !== 'ObjectExpression') {
-      this._entriesFileIncosistentError(
-        'Right side of the assignment must be an ObjectExpression'
-      );
-    }
-
-    // Finally add the entry
-    expression.right.properties.push(
-      astUtils.stringLiteralProperty(this.props.name, this.props.name + '.js')
-    );
-
-    this.fs.write(this.destinationPath('webpack/entries.js'), astUtils.generate(ast));
   }
 };

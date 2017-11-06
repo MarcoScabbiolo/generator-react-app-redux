@@ -52,10 +52,9 @@ function testSuite(
       test('combines all the reducers', () => {
         assert.fileContent(
           generator._reducerToCreateFilePath,
-          `const reducer = combineReducers({
-  ${_.keys(generator.props.reducers).join(`,
-  `)}
-});`
+          'const reducer = combineReducers({\n  ' +
+            _.keys(generator.props.reducers).join(',\n  ') +
+            '\n});'
         );
       });
     } else {
