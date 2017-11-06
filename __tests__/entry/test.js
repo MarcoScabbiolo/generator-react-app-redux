@@ -3,6 +3,7 @@ const path = require('path');
 const assert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 const astUtils = require('../../generators/astUtils');
+const testUtils = require('../_utils/testUtils');
 const fs = require('fs-extra');
 const store = require('../store/test');
 const reducer = require('../reducer/test');
@@ -10,6 +11,8 @@ const component = require('../component/test');
 const reactReduxEnvironment = require('../../generators/ReactReduxEnvironment');
 const environment = require('../../generators/entry/Environment');
 require('should');
+
+const [envIndex, envFoo] = testUtils.testEnvironment(environment);
 
 function testSuite(
   options = {
@@ -26,12 +29,33 @@ function testSuite(
       path: 'generator_tests',
       name: 'test'
     }
-  }
+  },
+  testEnvironment = false
 ) {
   var generator = new (environment(reactReduxEnvironment()))();
   generator.forceConfiguration(options.options, options.prompts);
 
   (options.skip ? describe.skip : describe)('generator-react-app-redux:entry', () => {
+    if (testEnvironment) {
+      describe('environment', () => {
+        test('html entry file path', () => {
+          envIndex()._htmlEntryFilePath.should.equal('index.ejs');
+          envFoo()._htmlEntryFilePath.should.equal('foo/bar.ejs');
+        });
+
+        test('related actions', () => {
+          envIndex()._relatedActions.should.deepEqual({
+            app: 'actions/app',
+            index: 'actions/index'
+          });
+          envFoo()._relatedActions.should.deepEqual({
+            app: 'actions/app',
+            bar: 'actions/foo/bar'
+          });
+        });
+      });
+    }
+
     if (options.runGenerator) {
       test('generator completes', () =>
         helpers

@@ -77,11 +77,14 @@ module.exports = (BaseClass = DummyBaseClass) =>
     _reducerFilePath(toJoin) {
       return path.join('src', this._reducerPath(toJoin)) + '.js';
     }
-    _sectionReducersPath(toJoin) {
-      return path.join('reducers/section', this._resolvePath(toJoin));
+    _sectionReducersPath(toJoin = '') {
+      return path.join('reducers', this.props.path, this.props.name, 'sections', toJoin);
     }
     _sectionReducersDirectoryPath(toJoin) {
       return path.join('src', this._sectionReducersPath(toJoin));
+    }
+    _sectionReducersFilePath(toJoin) {
+      return this._sectionReducersDirectoryPath(toJoin) + '.js';
     }
     _componentsPath(toJoin) {
       return path.join('components', this._resolvePath(toJoin));
@@ -89,8 +92,14 @@ module.exports = (BaseClass = DummyBaseClass) =>
     _componentsDirectoryPath(toJoin) {
       return path.join('src', this._componentsPath(toJoin));
     }
+    _componentsFilePath(toJoin) {
+      return this._componentsDirectoryPath(toJoin) + '.js';
+    }
     _containersPath(toJoin) {
       return path.join('containers', this._resolvePath(toJoin));
+    }
+    _containersDirectoryPath(toJoin) {
+      return path.join('src', this._containersPath(toJoin));
     }
     _containersFilePath(toJoin) {
       return path.join('src', this._containersPath(toJoin)) + '.js';

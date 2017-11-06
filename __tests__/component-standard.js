@@ -1,4 +1,4 @@
 'use strict';
 const component = require('./component/test.js');
 
-component();
+component(undefined, true);

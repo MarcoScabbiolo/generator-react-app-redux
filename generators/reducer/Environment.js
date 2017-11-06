@@ -6,7 +6,7 @@ module.exports = (BaseClass = DummyBaseClass) =>
   class extends BaseClass {
     get _reducerToCreatePath() {
       if (this.props.type === 'section') {
-        return this._sectionReducersPath();
+        return this._sectionReducersPath(this.props.name);
       }
       return this._reducerPath();
     }

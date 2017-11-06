@@ -7,6 +7,8 @@ const environment = require('../../generators/component/Environment');
 const testUtils = require('../_utils/testUtils');
 require('should');
 
+const [envIndex, envFoo] = testUtils.testEnvironment(environment, { type: 'section' });
+
 function testSuite(
   options = {
     runGenerator: true,
@@ -18,12 +20,23 @@ function testSuite(
       bootstrap: true
     },
     options: {}
-  }
+  },
+  testEnvironment = false
 ) {
   var generator = new (environment(reactReduxEnvironment()))();
   generator.forceConfiguration(options.options, options.prompts);
 
   describe('generator-react-app-redux:component', () => {
+    if (testEnvironment) {
+      describe('environment', () => {
+        test('component to create path', () => {
+          envIndex()._componentToCreatePath.should.equal('components/index');
+          envIndex()._componentToCreateFilePath.should.equal('src/components/index.js');
+          envFoo()._componentToCreatePath.should.equal('components/foo/bar');
+          envFoo()._componentToCreateFilePath.should.equal('src/components/foo/bar.js');
+        });
+      });
+    }
     if (options.runGenerator) {
       test('generator completes', () =>
         helpers

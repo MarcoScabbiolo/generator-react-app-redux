@@ -1,6 +1,8 @@
 const assert = require('yeoman-assert');
 const yeoman = require('yeoman-environment');
 const adapters = require('yeoman-test/lib/adapter');
+const extend = require('deep-extend');
+const reactReduxEnvironment = require('../../generators/ReactReduxEnvironment');
 
 function testFileContentsByProp({ testTrue, testFalse, prop, file, content }) {
   if (prop) {
@@ -22,7 +24,23 @@ function generatorInstance(generator, options) {
   return gen;
 }
 
+function testEnvironment(environmentClass, indexOptions = {}) {
+  var env = (envPath, name) =>
+    new (environmentClass(reactReduxEnvironment()))([envPath, name]);
+  return [
+    () => {
+      let e = env('index', '');
+      let options = { path: '', name: 'index', skipEntryDirectory: true };
+      options = extend(options, indexOptions);
+      e.forceConfiguration(options, {});
+      return e;
+    },
+    () => env('bar', 'foo')
+  ];
+}
+
 module.exports = {
   testFileContentsByProp,
-  generatorInstance
+  generatorInstance,
+  testEnvironment
 };

@@ -2,10 +2,13 @@
 const path = require('path');
 const assert = require('yeoman-assert');
 const helpers = require('yeoman-test');
+const testUtils = require('../_utils/testUtils');
 const _ = require('lodash');
 const reactReduxEnvironment = require('../../generators/ReactReduxEnvironment');
 const environment = require('../../generators/reducer/Environment');
 require('should');
+
+const [envIndex, envFoo] = testUtils.testEnvironment(environment, { type: 'section' });
 
 function testSuite(
   options = {
@@ -21,12 +24,25 @@ function testSuite(
         other: 'actions/other'
       }
     }
-  }
+  },
+  testEnvironment = false
 ) {
   var generator = new (environment(reactReduxEnvironment()))();
   generator.forceConfiguration(options.options, options.prompts);
 
   describe('generator-react-app-redux:reducer', () => {
+    if (testEnvironment) {
+      describe('environment', () => {
+        test('reducer to create path', () => {
+          envIndex()._reducerToCreatePath.should.equal('reducers/index/sections/index');
+          envIndex()._reducerToCreateFilePath.should.equal(
+            'src/reducers/index/sections/index.js'
+          );
+          envFoo()._reducerToCreatePath.should.equal('reducers/foo/bar');
+          envFoo()._reducerToCreateFilePath.should.equal('src/reducers/foo/bar.js');
+        });
+      });
+    }
     if (options.runGenerator) {
       test('generator completes', () =>
         helpers
