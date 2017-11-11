@@ -5,7 +5,7 @@ const chalk = require('chalk');
 const types = require('babel-types');
 const astUtils = require('../astUtils');
 
-const shared = ['bootstrap', 'thunk', 'path', 'normalizr'];
+const shared = ['bootstrap', 'thunk', 'path', 'normalizr', 'form'];
 const prompts = [
   {
     name: 'name',
@@ -41,6 +41,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
         name: this.props.name,
         thunk: this.props.thunk,
         normalizr: this.props.normalizr,
+        form: this.props.form,
         path: this.props.path
       });
 
@@ -54,6 +55,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
       this.composeWith(require.resolve('../component'), {
         name: this.props.name,
         path: this.props.path,
+        bootstrap: this.props.bootstrap,
         container: true,
         type: 'section'
       });

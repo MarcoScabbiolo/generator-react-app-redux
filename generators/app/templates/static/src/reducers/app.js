@@ -1,10 +1,13 @@
-import * as app from 'actions';
+import * as app from 'actions/app';
 
-const reducer = (state = {
-  loading: false,
-  error: undefined,
-}, action) => {
+const initialState = {
+  initialized: false
+};
+
+const reducer = (state = initialState, action) => {
   switch (action.type) {
+    case app.INITALIZE:
+      return { ...state, initialized: true };
     default:
       return state;
   }

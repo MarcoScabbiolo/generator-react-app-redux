@@ -37,7 +37,7 @@ options.getAll = function() {
 options.include = function(config, param, log) {
   if (!_.isFunction(config)) {
     throw new TypeError(
-      `options.include must be passed the config method of the Generator bound to the Generator itself as its first parameter, instead it was passed a ${typeof param}`
+      `options.include must be passed the config method of the Generator bound to the Generator itself as its first parameter, instead it was passed a ${typeof config}`
     );
   }
 

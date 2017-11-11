@@ -1,4 +1,3 @@
-
 const loadingState = {
   loading: true,
   error: undefined
@@ -19,8 +18,6 @@ function errorState (error) {
 const loadingActions = [];
 const notLoadingActions = [];
 const errorActions = [];
-
-// #__esprima-breakpoint__#
 
 const initialState = {
   ...notLoadingState

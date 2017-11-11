@@ -40,6 +40,7 @@ module.exports = class extends Generator {
         bootstrap: this.props.bootstrap,
         thunk: this.props.thunk,
         normalizr: this.props.normalizr,
+        form: this.props.form,
         path: '',
         skipEntryDirectory: true
       });

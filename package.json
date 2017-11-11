@@ -35,7 +35,6 @@
     "yeoman-test": "^1.7.0"
   },
   "dependencies": {
-    "babel-eslint": "^8.0.1",
     "babel-generator": "^6.26.0",
     "babel-types": "^6.26.0",
     "babylon": "^6.18.0",
