@@ -12,6 +12,7 @@ module.exports = (BaseClass = DummyBaseClass) =>
 
       if (_.isString(args)) {
         this.props.name = args;
+        this.props.path = '';
       } else if (_.isArray(args) && args.length) {
         this.props.name = args[0];
         this.props.path = args[1];

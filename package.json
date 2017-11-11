@@ -9,7 +9,7 @@
     "url": ""
   },
   "files": ["generators"],
-  "main": "generators/index.js",
+  "main": "generators/app/index.js",
   "keywords": [
     "Yeoman",
     "Generator",
@@ -18,6 +18,12 @@
     "Redux",
     "yeoman-generator"
   ],
+  "scripts": {
+    "prepublish": "nsp check",
+    "pretest": "eslint . --fix",
+    "precommit": "lint-staged",
+    "test": "jest --coverage"
+  },
   "devDependencies": {
     "coveralls": "^2.13.1",
     "eslint": "^4.1.0",
@@ -50,12 +56,6 @@
   "jest": {
     "testEnvironment": "node",
     "testMatch": ["**/__tests__/*.js?(x)"]
-  },
-  "scripts": {
-    "prepublish": "nsp check",
-    "pretest": "eslint . --fix",
-    "precommit": "lint-staged",
-    "test": "jest"
   },
   "lint-staged": {
     "*.js": ["eslint --fix", "git add"],
