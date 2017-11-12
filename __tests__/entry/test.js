@@ -17,16 +17,12 @@ const entryInAstArray = (e, generator) =>
   e.type === 'ObjectProperty' &&
   e.key.name === generator.props.name &&
   e.value.value === generator._jsEntryFilePath;
-const assertAddedEntry = (generator, result = true) =>
+const assertAddedEntry = generator =>
   chai
     .expect(astUtils.parse(fs.readFileSync('webpack/entries.js', 'utf-8')))
     .to.have.nested.property('program.body[0].expression.right.properties')
     .that.is.an('array')
-    .and.satisfies(entries =>
-      entries.some(
-        result ? e => entryInAstArray(e, generator) : e => !entryInAstArray(e, generator)
-      )
-    );
+    .and.satisfies(entries => entries.some(e => entryInAstArray(e, generator)));
 
 function testSuite(
   options = {
