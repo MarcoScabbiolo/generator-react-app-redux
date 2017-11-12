@@ -57,7 +57,7 @@
   "jest": {
     "testEnvironment": "node",
     "testMatch": ["**/__tests__/*.js?(x)"],
-    "setupFiles": ["./__tests__/_utils/global.js"],
+    "setupTestFrameworkScriptFile": "./__tests__/_utils/global.js",
     "coveragePathIgnorePatterns": ["/node_modules/", "/__tests__/"]
   },
   "lint-staged": {
