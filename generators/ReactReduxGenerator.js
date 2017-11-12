@@ -5,6 +5,7 @@ const reactReduxEnvironment = require('./ReactReduxEnvironment');
 const _ = require('lodash');
 const extend = require('deep-extend');
 const chalk = require('chalk');
+const assert = require('chai').assert;
 
 // Yeoman doesn't deal very well with extending the base Generator so we augment the generators from their constructors
 // That is, resorting to JS objects instead of classes
@@ -34,6 +35,10 @@ module.exports = class extends reactReduxEnvironment(Generator) {
       reactReduxGeneratorOptions.shared,
       this.log.bind(this)
     );
+  }
+  get _templateByTypeContents() {
+    assert.isString(this.props.type, `Property 'type' of the generator must be a string`);
+    return this.fs.read(this.templatePath(`${this.props.type}.js`));
   }
   _initializing() {
     this.props = Object.assign({}, this.options, this.props);

@@ -72,10 +72,7 @@ module.exports = class extends ReactReduxGenerator {
     if (this.props.form) {
       ast = astUtils.newImport(
         ast,
-        types.importDeclaration(
-          [types.importSpecifier(types.identifier('form'), types.identifier('reducer'))],
-          types.stringLiteral('redux-form')
-        )
+        astUtils.singleSpecifierImportDeclaration(['form', 'reducer'], 'redux-form')
       );
 
       toCombine.push(astUtils.shorthandProperty('form'));
@@ -84,30 +81,14 @@ module.exports = class extends ReactReduxGenerator {
     // Import sections reducer
     ast = astUtils.newImport(
       ast,
-      types.importDeclaration(
-        [
-          types.importSpecifier(
-            types.identifier('sections'),
-            types.identifier('sections')
-          )
-        ],
-        types.stringLiteral(this._sectionsReducerPath)
-      )
+      astUtils.singleSpecifierImportDeclaration('sections', this._sectionsReducerPath)
     );
     toCombine.push(astUtils.shorthandProperty('sections'));
 
     // Import entities reducer
     ast = astUtils.newImport(
       ast,
-      types.importDeclaration(
-        [
-          types.importSpecifier(
-            types.identifier('entities'),
-            types.identifier('entities')
-          )
-        ],
-        types.stringLiteral(this._entitiesReducerPath)
-      )
+      astUtils.singleSpecifierImportDeclaration('entities', this._entitiesReducerPath)
     );
     toCombine.push(astUtils.shorthandProperty('entities'));
 
@@ -123,9 +104,10 @@ module.exports = class extends ReactReduxGenerator {
     // Import the reducer
     ast = astUtils.newImport(
       ast,
-      types.importDeclaration(
-        [types.importDefaultSpecifier(types.identifier('mainReducer'))],
-        types.stringLiteral(this._rootReducerPath)
+      astUtils.singleSpecifierImportDeclaration(
+        'mainReducer',
+        this._rootReducerPath,
+        true
       )
     );
 
@@ -133,10 +115,7 @@ module.exports = class extends ReactReduxGenerator {
     if (this.props.thunk) {
       ast = astUtils.newImport(
         ast,
-        types.importDeclaration(
-          [types.importDefaultSpecifier(types.identifier('thunk'))],
-          types.stringLiteral('redux-thunk')
-        )
+        astUtils.singleSpecifierImportDeclaration('thunk', 'redux-thunk', true)
       );
     }
 

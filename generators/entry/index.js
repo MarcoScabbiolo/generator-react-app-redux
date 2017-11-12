@@ -79,18 +79,12 @@ module.exports = class extends environment(ReactReduxGenerator) {
     // Import the main container
     ast = astUtils.newImport(
       ast,
-      types.importDeclaration(
-        [types.importDefaultSpecifier(types.identifier('Main'))],
-        types.stringLiteral(this._defaultContainerPath)
-      )
+      astUtils.singleSpecifierImportDeclaration('Main', this._defaultContainerPath, true)
     );
     // Import the store
     ast = astUtils.newImport(
       ast,
-      types.importDeclaration(
-        [types.importDefaultSpecifier(types.identifier('configureStore'))],
-        types.stringLiteral(this._storePath)
-      )
+      astUtils.singleSpecifierImportDeclaration('configureStore', this._storePath, true)
     );
 
     // Set the main container path variable to be used by HMR

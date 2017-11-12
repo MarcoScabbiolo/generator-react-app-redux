@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const chalk = require('chalk');
+const assert = require('chai').assert;
 
 const options = {
   bootstrap: {
@@ -35,11 +36,10 @@ options.getAll = function() {
 };
 
 options.include = function(config, param, log) {
-  if (!_.isFunction(config)) {
-    throw new TypeError(
-      `options.include must be passed the config method of the Generator bound to the Generator itself as its first parameter, instead it was passed a ${typeof config}`
-    );
-  }
+  assert.isFunction(
+    config,
+    `options.include must be passed the config method of the Generator bound to the Generator itself as its first parameter, instead it was passed a ${typeof config}`
+  );
 
   if (_.isArray(param)) {
     var allOptions = options.getAll();
@@ -54,11 +54,8 @@ options.include = function(config, param, log) {
       log(chalk.yellow(`Options ${notIncluded} do not exist and could not be included`));
     }
   } else if (_.isString(param)) {
-    if (options[param]) {
-      config(param, options[param]);
-    } else {
-      throw new Error(`Shared option ${param} does not exist`);
-    }
+    assert.property(options, param, `Shared option ${param} does not exist`);
+    config(param, options[param]);
   } else {
     throw new TypeError(
       `options.include must be passed an option name or an array of option names as its seconds parameter, instead it was passed ${typeof options}`

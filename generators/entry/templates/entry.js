@@ -7,31 +7,26 @@ import App from 'containers/App';
 const mainContainerPath = '';
 const store = configureStore();
 
-ReactDOM.render(
-  <AppContainer>
-    <Provider store={store}>
-      <App>
-        <Main />
-      </App>
-    </Provider>
-  </AppContainer>,
-  document.getElementById('react-entry-point')
-);
+const render = (App, Main) => {
+  ReactDOM.render(
+    <AppContainer>
+      <Provider store={store}>
+        <App>
+          <Main />
+        </App>
+      </Provider>
+    </AppContainer>,
+    document.getElementById('react-entry-point')
+  );
+};
+
+render(App, Main);
 
 if (module.hot) {
   module.hot.accept(['containers/App', mainContainerPath], () => {
     const NextApp = require('containers/App').default; // eslint-disable-line global-require
-    const MainContainer = require(mainContainerPath).default; // eslint-disable-line global-require
+    const NextMain = require(mainContainerPath).default; // eslint-disable-line global-require
 
-    ReactDOM.render(
-      <AppContainer>
-        <Provider store={store}>
-          <NextApp>
-            <MainContainer />
-          </NextApp>
-        </Provider>
-      </AppContainer>,
-      document.getElementById('react-entry-point')
-    );
+    render(NextApp, NextMain);
   });
 }

@@ -73,14 +73,11 @@ module.exports = class extends environment(ReactReduxGenerator) {
   prompting() {
     return this._prompting();
   }
-  get _templateContents() {
-    return this.fs.read(this.templatePath(`${this.props.type}.js`));
-  }
   get _componentName() {
     return _.upperFirst(this.props.name);
   }
   writing() {
-    let ast = astUtils.parse(this._templateContents);
+    let ast = astUtils.parse(this._templateByTypeContents);
 
     if (this.props.bootstrap) {
       // Include Bootstrap

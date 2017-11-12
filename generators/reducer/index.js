@@ -71,11 +71,8 @@ module.exports = class extends environment(ReactReduxGenerator) {
   prompting() {
     return this._prompting();
   }
-  get _templateContents() {
-    return this.fs.read(this.templatePath(`${this.props.type}.js`));
-  }
   writing() {
-    let ast = astUtils.parse(this._templateContents);
+    let ast = astUtils.parse(this._templateByTypeContents);
 
     // Import all the included actions
     if (this.props.type !== 'composition' && this.props.actions) {
@@ -99,10 +96,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
         // Import the reducer
         ast = astUtils.newImport(
           ast,
-          types.importDeclaration(
-            [types.importDefaultSpecifier(types.identifier(name))],
-            types.stringLiteral(filePath)
-          )
+          astUtils.singleSpecifierImportDeclaration(name, filePath, true)
         );
         // Combine it
         combination.push(astUtils.shorthandProperty(name));

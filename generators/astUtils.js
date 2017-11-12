@@ -12,6 +12,25 @@ function shorthandProperty(name) {
   );
 }
 
+function singleSpecifierImportDeclaration(identifier, path, isDefault = false) {
+  let localIdentifier = types.identifier(
+    typeof identifier === 'string' ? identifier : identifier[0]
+  );
+  return types.importDeclaration(
+    [
+      isDefault
+        ? types.importDefaultSpecifier(localIdentifier)
+        : types.importSpecifier(
+            localIdentifier,
+            typeof identifier === 'string'
+              ? localIdentifier
+              : types.identifier(identifier[1])
+          )
+    ],
+    types.stringLiteral(path)
+  );
+}
+
 function newImport(ast, importDeclaration) {
   let index = _.findLastIndex(ast.body, types.isImportDeclaration) + 1;
   ast.program.body.splice(index, 0, importDeclaration);
@@ -53,6 +72,7 @@ function parse(code) {
 module.exports = {
   parse,
   generate,
+  singleSpecifierImportDeclaration,
   findSingleVariableDeclaration,
   findClassDeclaration,
   findDefaultExportDeclaration,
