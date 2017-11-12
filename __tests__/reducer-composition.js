@@ -1,6 +1,8 @@
 'use strict';
 const reducer = require('./reducer/test.js');
 
+jest.setTimeout(15000);
+
 reducer({
   runGenerator: true,
   options: {
