@@ -4,8 +4,9 @@
 
 React &amp; Redux generator, no server side.
 
-Not ready yet! Any contributions are welcome.
+Not ready yet! Any [contributions][contribute] are welcome.
 
+[contribute]: Contributing.md
 [travis]: https://travis-ci.org/MarcoScabbiolo/generator-react-app-redux.svg?branch=master "Travis CI build status"
 [coveralls-status]: https://coveralls.io/github/MarcoScabbiolo/generator-react-app-redux?branch=master
 [coveralls-badge]: https://coveralls.io/repos/github/MarcoScabbiolo/generator-react-app-redux/badge.svg?branch=master "Coveralls coverage status"
