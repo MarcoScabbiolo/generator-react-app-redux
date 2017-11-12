@@ -3,3 +3,5 @@ node_js:
   - 7
   - 6
 after_script: 'cat ./coverage/lcov.info | coveralls'
+env:
+  - JEST_TIMEOUT=50000

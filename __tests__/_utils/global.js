@@ -1,3 +1,5 @@
 'use strict';
 
-module.exports = () => jest.setTimeout(30000);
+jest.setTimeout(
+  process.env.JEST_TIMEOUT ? parseInt(process.env.JEST_TIMEOUT, 10) : 30000
+);
