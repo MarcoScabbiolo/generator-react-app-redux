@@ -48,6 +48,10 @@ function testSuite(
   (options.skip ? describe.skip : describe)('generator-react-app-redux:entry', () => {
     if (testEnvironment) {
       describe('environment', () => {
+        test('returns', () => {
+          chai.assert.exists(new (environment())());
+        });
+
         test('html entry file path', () => {
           chai.expect(envIndex()._htmlEntryFilePath).to.equal('index.ejs');
           chai.expect(envFoo()._htmlEntryFilePath).to.equal('foo/bar.ejs');

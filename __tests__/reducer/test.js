@@ -6,6 +6,7 @@ const testUtils = require('../_utils/testUtils');
 const _ = require('lodash');
 const reactReduxEnvironment = require('../../generators/ReactReduxEnvironment');
 const environment = require('../../generators/reducer/Environment');
+const chai = require('chai');
 require('chai').should();
 
 const [envIndex, envFoo] = testUtils.testEnvironment(environment, { type: 'section' });
@@ -33,6 +34,10 @@ function testSuite(
   describe('generator-react-app-redux:reducer', () => {
     if (testEnvironment) {
       describe('environment', () => {
+        test('returns', () => {
+          chai.assert.exists(new (environment())());
+        });
+
         test('reducer to create path', () => {
           envIndex()._reducerToCreatePath.should.equal('reducers/index/sections/index');
           envIndex()._reducerToCreateFilePath.should.equal(

@@ -5,7 +5,7 @@ const helpers = require('yeoman-test');
 const reactReduxEnvironment = require('../../generators/ReactReduxEnvironment');
 const environment = require('../../generators/component/Environment');
 const testUtils = require('../_utils/testUtils');
-const expect = require('chai').expect;
+const chai = require('chai');
 
 const [envIndex, envFoo] = testUtils.testEnvironment(environment, { type: 'section' });
 
@@ -29,15 +29,19 @@ function testSuite(
   describe('generator-react-app-redux:component', () => {
     if (testEnvironment) {
       describe('environment', () => {
+        test('returns', () => {
+          chai.assert.exists(new (environment())());
+        });
+
         test('component to create path', () => {
-          expect(envIndex()._componentToCreatePath).to.equal('components/index');
-          expect(envIndex()._componentToCreateFilePath).to.equal(
-            'src/components/index.js'
-          );
-          expect(envFoo()._componentToCreatePath).to.equal('components/foo/bar');
-          expect(envFoo()._componentToCreateFilePath).to.equal(
-            'src/components/foo/bar.js'
-          );
+          chai.expect(envIndex()._componentToCreatePath).to.equal('components/index');
+          chai
+            .expect(envIndex()._componentToCreateFilePath)
+            .to.equal('src/components/index.js');
+          chai.expect(envFoo()._componentToCreatePath).to.equal('components/foo/bar');
+          chai
+            .expect(envFoo()._componentToCreateFilePath)
+            .to.equal('src/components/foo/bar.js');
         });
       });
     }
