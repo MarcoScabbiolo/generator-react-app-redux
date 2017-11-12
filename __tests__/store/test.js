@@ -4,7 +4,6 @@ const assert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 const testUtils = require('../_utils/testUtils');
 const environment = require('../../generators/ReactReduxEnvironment');
-require('should');
 
 function testSuite(
   options = {

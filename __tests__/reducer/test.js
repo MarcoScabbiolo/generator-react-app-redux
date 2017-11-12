@@ -6,7 +6,7 @@ const testUtils = require('../_utils/testUtils');
 const _ = require('lodash');
 const reactReduxEnvironment = require('../../generators/ReactReduxEnvironment');
 const environment = require('../../generators/reducer/Environment');
-require('should');
+require('chai').should();
 
 const [envIndex, envFoo] = testUtils.testEnvironment(environment, { type: 'section' });
 

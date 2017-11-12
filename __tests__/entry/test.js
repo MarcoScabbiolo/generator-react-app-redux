@@ -10,7 +10,7 @@ const reducer = require('../reducer/test');
 const component = require('../component/test');
 const reactReduxEnvironment = require('../../generators/ReactReduxEnvironment');
 const environment = require('../../generators/entry/Environment');
-require('should');
+const chai = require('chai');
 
 const [envIndex, envFoo] = testUtils.testEnvironment(environment);
 
@@ -39,16 +39,16 @@ function testSuite(
     if (testEnvironment) {
       describe('environment', () => {
         test('html entry file path', () => {
-          envIndex()._htmlEntryFilePath.should.equal('index.ejs');
-          envFoo()._htmlEntryFilePath.should.equal('foo/bar.ejs');
+          chai.expect(envIndex()._htmlEntryFilePath).to.equal('index.ejs');
+          chai.expect(envFoo()._htmlEntryFilePath).to.equal('foo/bar.ejs');
         });
 
         test('related actions', () => {
-          envIndex()._relatedActions.should.deepEqual({
+          chai.expect(envIndex()._relatedActions).to.deep.equal({
             app: 'actions/app',
             index: 'actions/index'
           });
-          envFoo()._relatedActions.should.deepEqual({
+          chai.expect(envFoo()._relatedActions).to.deep.equal({
             app: 'actions/app',
             bar: 'actions/foo/bar'
           });
@@ -85,30 +85,23 @@ function testSuite(
           `import configureStore from '${generator._storePath}`
         );
       });
-      test('adds entry', () => {
-        if (fs.existsSync('webpack/entries.js')) {
-          astUtils
-            .parse(fs.readFileSync('webpack/entries.js', 'utf-8'))
-            .should.have.propertyByPath(
-              'program',
-              'body',
-              0,
-              'expression',
-              'right',
-              'properties'
+    });
+
+    test('adds entry', () => {
+      if (fs.existsSync('webpack/entries.js')) {
+        chai
+          .expect(astUtils.parse(fs.readFileSync('webpack/entries.js', 'utf-8')))
+          .to.have.nested.property('program.body[0].expression.right.properties')
+          .that.is.an('array')
+          .and.satisfies(entries =>
+            entries.some(
+              e =>
+                e.type === 'ObjectProperty' &&
+                e.key.name === generator.props.name &&
+                e.value.value === generator._jsEntryFilePath
             )
-            .which.is.Array()
-            .and.matchAny(function(property) {
-              property.should.have.value('type', 'ObjectProperty');
-              property.should.have
-                .property('key')
-                .with.value('name', generator.props.name);
-              property.should.have
-                .property('value')
-                .with.value('value', generator._jsEntryFilePath);
-            });
-        }
-      });
+          );
+      }
     });
 
     store({

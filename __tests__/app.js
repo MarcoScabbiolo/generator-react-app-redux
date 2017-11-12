@@ -4,7 +4,9 @@ const assert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 const fs = require('fs-extra');
 const entry = require('./entry/test.js');
-require('should');
+const expect = require('chai').expect;
+
+jest.setTimeout(20000);
 
 const dummyDependencies = [[helpers.createDummyGenerator(), 'generator-node:app']];
 
@@ -41,11 +43,11 @@ describe('generator-react-app-redux:app', () => {
 
   test('dependencies', () =>
     fs.readJson('package.json').then(pkg => {
-      pkg.dependencies.should.have.properties([
+      expect(pkg.dependencies).to.include.all.keys(
         'redux-thunk',
         'react-bootstrap',
         'redux-form'
-      ]);
+      );
     }));
 
   entry({

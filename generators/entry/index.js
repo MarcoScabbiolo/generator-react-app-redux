@@ -2,6 +2,7 @@
 const ReactReduxGenerator = require('../ReactReduxGenerator');
 const environment = require('./Environment');
 const chalk = require('chalk');
+const assert = require('chai').assert;
 const types = require('babel-types');
 const astUtils = require('../astUtils');
 
@@ -99,11 +100,10 @@ module.exports = class extends environment(ReactReduxGenerator) {
       'mainContainerPath'
     );
 
-    if (!mainContainerPathVariable) {
-      throw new Error(
-        'Could not find the declaration of the variable mainContainerPath in the JS entry template'
-      );
-    }
+    assert.isOk(
+      mainContainerPathVariable,
+      'Could not find the declaration of the variable mainContainerPath in the JS entry template'
+    );
 
     mainContainerPathVariable.declarations[0].init.value = this._defaultContainerPath;
     mainContainerPathVariable.declarations[0].init.raw = `'${this
@@ -119,9 +119,9 @@ module.exports = class extends environment(ReactReduxGenerator) {
     );
   }
   _entriesFileIncosistentError(details) {
-    throw new Error(
+    return (
       'Unable to edit the entries file in src/webpack/entries.js , you will have to manually add the JavaScript and HTML entries: ' +
-        details
+      details
     );
   }
   writing() {
@@ -141,14 +141,20 @@ module.exports = class extends environment(ReactReduxGenerator) {
       types.assertAssignmentExpression(expression);
       types.assertMemberExpression(expression.left);
 
-      if (
-        expression.left.object.name !== 'module' ||
-        expression.left.property.name !== 'exports'
-      ) {
+      assert.strictEqual(
+        expression.left.object.name,
+        'module',
         this._entriesFileIncosistentError(
-          'Left side of the assignment must be a MemberExpression for the object module and the property exports'
-        );
-      }
+          'Left side of the assignment must be a MemberExpression for the object module'
+        )
+      );
+      assert.strictEqual(
+        expression.left.property.name,
+        'exports',
+        this._entriesFileIncosistentError(
+          'Left side of the assignment must be a MemberExpression for the property exports'
+        )
+      );
 
       types.assertObjectExpression(expression.right);
 

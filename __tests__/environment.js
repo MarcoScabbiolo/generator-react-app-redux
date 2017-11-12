@@ -1,6 +1,6 @@
 'use strict';
 const reactReduxEnvironment = require('../generators/ReactReduxEnvironment');
-require('should');
+require('chai').should();
 
 const e = (path = '', name = '') => new (reactReduxEnvironment())([name, path]);
 const index = () => e('', 'index');

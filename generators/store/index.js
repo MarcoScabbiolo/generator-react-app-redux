@@ -1,6 +1,7 @@
 'use strict';
 const ReactReduxGenerator = require('../ReactReduxGenerator');
 const types = require('babel-types');
+const assert = require('chai').assert;
 const astUtils = require('../astUtils');
 
 const shared = ['thunk', 'path', 'form', 'normalizr'];
@@ -146,11 +147,10 @@ module.exports = class extends ReactReduxGenerator {
       'mainReducerPath'
     );
 
-    if (!mainReducerPathVariable) {
-      throw new Error(
-        'Could not find the declaration of the variable mainReducerPath in the store template'
-      );
-    }
+    assert.isOk(
+      mainReducerPathVariable,
+      'Could not find the declaration of the variable mainReducerPath in the store template'
+    );
 
     mainReducerPathVariable.declarations[0].init.value = this._rootReducerPath;
     mainReducerPathVariable.declarations[0].init.raw = `'${this.rootReducerPath}'`;
@@ -161,17 +161,15 @@ module.exports = class extends ReactReduxGenerator {
       'const',
       'middleware'
     );
+    assert.isOk(
+      middlewareVariable,
+      'Could not find the declaration of the variable middleware in the store template'
+    );
 
-    if (!middlewareVariable) {
-      throw new Error(
-        'Could not find the declaration of the variable middleware in the store template'
-      );
-    }
-    if (!types.isArrayExpression(middlewareVariable.declarations[0].init)) {
-      throw new Error(
-        'The middleware variable declarations right side is not an ArrayExpression'
-      );
-    }
+    assert(
+      types.isArrayExpression(middlewareVariable.declarations[0].init),
+      'The middleware variable declarations right side is not an ArrayExpression'
+    );
 
     // Add the redux-thunk middleware if included
     if (this.props.thunk) {

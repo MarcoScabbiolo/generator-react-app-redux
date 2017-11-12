@@ -5,7 +5,7 @@ const helpers = require('yeoman-test');
 const reactReduxEnvironment = require('../../generators/ReactReduxEnvironment');
 const environment = require('../../generators/component/Environment');
 const testUtils = require('../_utils/testUtils');
-require('should');
+const expect = require('chai').expect;
 
 const [envIndex, envFoo] = testUtils.testEnvironment(environment, { type: 'section' });
 
@@ -30,10 +30,14 @@ function testSuite(
     if (testEnvironment) {
       describe('environment', () => {
         test('component to create path', () => {
-          envIndex()._componentToCreatePath.should.equal('components/index');
-          envIndex()._componentToCreateFilePath.should.equal('src/components/index.js');
-          envFoo()._componentToCreatePath.should.equal('components/foo/bar');
-          envFoo()._componentToCreateFilePath.should.equal('src/components/foo/bar.js');
+          expect(envIndex()._componentToCreatePath).to.equal('components/index');
+          expect(envIndex()._componentToCreateFilePath).to.equal(
+            'src/components/index.js'
+          );
+          expect(envFoo()._componentToCreatePath).to.equal('components/foo/bar');
+          expect(envFoo()._componentToCreateFilePath).to.equal(
+            'src/components/foo/bar.js'
+          );
         });
       });
     }
