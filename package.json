@@ -56,7 +56,8 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/__tests__/*.js?(x)"]
+    "testMatch": ["**/__tests__/*.js?(x)"],
+    "setupFiles": ["./__tests__/_utils/global.js"]
   },
   "lint-staged": {
     "*.js": ["eslint --fix", "git add"],
