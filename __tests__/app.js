@@ -6,7 +6,7 @@ const fs = require('fs-extra');
 const entry = require('./entry/test.js');
 const expect = require('chai').expect;
 
-jest.setTimeout(20000);
+jest.setTimeout(30000);
 
 const dummyDependencies = [[helpers.createDummyGenerator(), 'generator-node:app']];
 
