@@ -14,6 +14,10 @@ describe('react-redux environment', () => {
     foo()._jsEntryFilePath.should.equal('src/foo/bar.js');
   });
 
+  it('name only', () => {
+    new (reactReduxEnvironment())('test')._jsEntryFilePath.should.equal('src/test.js');
+  });
+
   it('actions path', () => {
     index()._actionsPath.should.equal('actions/index');
     index()._actionsFilePath.should.equal('src/actions/index.js');

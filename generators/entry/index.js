@@ -70,7 +70,10 @@ module.exports = class extends environment(ReactReduxGenerator) {
           chalk.green(this.props.name) +
           chalk.yellow(' aldready exists, you cannot override an entry')
       );
-      process.exit();
+      this.aborted = true;
+      this.env.error(
+        `File ${this.destinationPath(this._jsEntryFilePath)} already exists. Aborting`
+      );
     }
   }
   _writeJSEntry() {

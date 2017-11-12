@@ -13,6 +13,20 @@ const environment = require('../../generators/entry/Environment');
 const chai = require('chai');
 
 const [envIndex, envFoo] = testUtils.testEnvironment(environment);
+const entryInAstArray = (e, generator) =>
+  e.type === 'ObjectProperty' &&
+  e.key.name === generator.props.name &&
+  e.value.value === generator._jsEntryFilePath;
+const assertAddedEntry = (generator, result = true) =>
+  chai
+    .expect(astUtils.parse(fs.readFileSync('webpack/entries.js', 'utf-8')))
+    .to.have.nested.property('program.body[0].expression.right.properties')
+    .that.is.an('array')
+    .and.satisfies(entries =>
+      entries.some(
+        result ? e => entryInAstArray(e, generator) : e => !entryInAstArray(e, generator)
+      )
+    );
 
 function testSuite(
   options = {
@@ -89,18 +103,7 @@ function testSuite(
 
     test('adds entry', () => {
       if (fs.existsSync('webpack/entries.js')) {
-        chai
-          .expect(astUtils.parse(fs.readFileSync('webpack/entries.js', 'utf-8')))
-          .to.have.nested.property('program.body[0].expression.right.properties')
-          .that.is.an('array')
-          .and.satisfies(entries =>
-            entries.some(
-              e =>
-                e.type === 'ObjectProperty' &&
-                e.key.name === generator.props.name &&
-                e.value.value === generator._jsEntryFilePath
-            )
-          );
+        assertAddedEntry(generator);
       }
     });
 
