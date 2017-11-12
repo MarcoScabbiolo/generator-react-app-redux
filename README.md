@@ -8,7 +8,7 @@ Not ready yet! Any contributions are welcome.
 
 [travis]: https://travis-ci.org/MarcoScabbiolo/generator-react-app-redux.svg?branch=master "Travis CI build status"
 [coveralls-status]: https://coveralls.io/github/MarcoScabbiolo/generator-react-app-redux?branch=master
-[coveralls-badge]: https://coveralls.io/repos/github/MarcoScabbiolo/generator-react-app-redux/badge.svg "Coveralls coverage status"
+[coveralls-badge]: https://coveralls.io/repos/github/MarcoScabbiolo/generator-react-app-redux/badge.svg?branch=master "Coveralls coverage status"
 [nsp-status]: https://nodesecurity.io/orgs/marcoscabbiolo/projects/cb8d373f-0923-4ab9-8816-19b8794e7c08
 [nsp-badge]: https://nodesecurity.io/orgs/marcoscabbiolo/projects/cb8d373f-0923-4ab9-8816-19b8794e7c08/badge "Node Security Platform vulnerabilities status"
 [codeclimate-status]: https://codeclimate.com/github/MarcoScabbiolo/generator-react-app-redux/maintainability
