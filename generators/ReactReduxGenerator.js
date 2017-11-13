@@ -11,15 +11,7 @@ const assert = require('chai').assert;
 // That is, resorting to JS objects instead of classes
 // To extend methods appended by this function you need to keep a reference to the old method and call it first in the new method
 module.exports = class extends reactReduxEnvironment(Generator) {
-  constructor(
-    args,
-    options,
-    reactReduxGeneratorOptions = {
-      shared: [],
-      prompts: [],
-      generatorName: 'A Generator'
-    }
-  ) {
+  constructor(args, options, reactReduxGeneratorOptions) {
     super(args, options);
 
     this.option('name', {

@@ -48,6 +48,20 @@ module.exports = class extends Generator {
       });
     });
   }
+  _extendJSON(target, source, write = true) {
+    source = source || target;
+    let json = {};
+    if (this.fs.exists(this.destinationPath(target))) {
+      json = this.fs.readJSON(this.destinationPath(target), {});
+    }
+    json = extend(json, this.fs.readJSON(this.templatePath(source), {}));
+
+    if (write) {
+      this.fs.writeJSON(this.destinationPath(target), json);
+    } else {
+      return json;
+    }
+  }
   writing() {
     this.fs.copy(this.templatePath('static/**'), this.destinationRoot());
     this.fs.copy(this.templatePath('static/**/.*'), this.destinationRoot());
@@ -70,8 +84,7 @@ module.exports = class extends Generator {
       astUtils.generate(component)
     );
 
-    let pkg = this.fs.readJSON(this.destinationPath('package.json'), {});
-    pkg = extend(pkg, this.fs.readJSON(this.templatePath('package.json'), {}));
+    let pkg = this._extendJSON('package.json', undefined, false);
 
     if (this.props.bootstrap) {
       pkg.dependencies['react-bootstrap'] = '^0.31.3';
@@ -84,6 +97,8 @@ module.exports = class extends Generator {
     }
 
     this.fs.writeJSON(this.destinationPath('package.json'), pkg);
+
+    this._extendJSON('.babelrc');
   }
 
   install() {

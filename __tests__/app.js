@@ -8,6 +8,12 @@ const expect = require('chai').expect;
 
 const dummyDependencies = [[helpers.createDummyGenerator(), 'generator-node:app']];
 
+const assertBabelrc = babelrc =>
+  expect(babelrc)
+    .to.have.property('plugins')
+    .which.is.an('array')
+    .and.includes('react-hot-loader/babel');
+
 describe('generator-react-app-redux:app', () => {
   test('generator completes', () =>
     helpers
@@ -46,6 +52,8 @@ describe('generator-react-app-redux:app', () => {
         "import * as B from 'react-bootstrap';"
       );
     });
+
+    test('babelrc', () => fs.readJson('.babelrc').then(assertBabelrc));
   });
 
   test('dependencies', () =>
@@ -65,6 +73,42 @@ describe('generator-react-app-redux:app', () => {
       form: true,
       normalizr: true,
       thunk: true,
+      path: '',
+      skipEntryDirectory: true
+    },
+    prompts: {}
+  });
+});
+
+describe('generator-react-app-redux:app:2', () => {
+  test('keeps original .babelrc', () =>
+    helpers
+      .run(path.join(__dirname, '../generators/app'))
+      .withOptions({ license: false })
+      .withPrompts({
+        bootstrap: false,
+        form: false,
+        normalizr: false,
+        thunk: false
+      })
+      .withGenerators(dummyDependencies)
+      .inTmpDir(dir => {
+        fs.writeFileSync(path.join(dir, '.babelrc'), '{ "dummy": "dummy" }');
+      })
+      .then(() => fs.readJson('.babelrc'))
+      .then(babelrc => {
+        assertBabelrc(babelrc);
+        expect(babelrc).to.have.property('dummy', 'dummy');
+      }));
+
+  entry({
+    runGenerator: false,
+    options: {
+      name: 'index',
+      bootstrap: false,
+      form: false,
+      normalizr: false,
+      thunk: false,
       path: '',
       skipEntryDirectory: true
     },
