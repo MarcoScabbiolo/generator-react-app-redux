@@ -1,7 +1,7 @@
 const baseWebpackConfiguration = require('./base');
 
 const distributionWebpackConfiguration = Object.assign(baseWebpackConfiguration, {
-  devtoool: 'none',
+  devtool: 'none',
 });
 
 module.exports = distributionWebpackConfiguration;

@@ -54,8 +54,8 @@ module.exports = class extends environment(ReactReduxGenerator) {
       });
 
       this.composeWith(require.resolve('../component'), {
-        name: this.props.name,
-        path: this.props.path,
+        name: 'index',
+        path: this.props.name,
         bootstrap: this.props.bootstrap,
         container: true,
         type: 'section'

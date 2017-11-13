@@ -32,8 +32,19 @@ _.forOwn(entries, (entry, name) => {
 const baseWebpackConfiguration = {
   entry: jsEntries,
   output: {
-    filename: '[name].[chunkhash].js',
+    filename: '[name].[hash].js',
     path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader'
+        }
+      }
+    ]
   },
   plugins: htmlEntries.concat([
 

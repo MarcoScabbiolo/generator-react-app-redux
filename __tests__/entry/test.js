@@ -132,8 +132,8 @@ function testSuite(
       runGenerator: false,
       options: {
         bootstrap: generator.props.bootstrap,
-        name: generator.props.name,
-        path: generator.props.path,
+        name: 'index',
+        path: generator.props.name,
         type: 'section'
       }
     });

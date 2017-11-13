@@ -1,5 +1,10 @@
 {
+  "presets": ["env", "react"],
   "plugins": [
-    "react-hot-loader/babel"
+    "react-hot-loader/babel",
+    "transform-object-rest-spread",
+    "transform-class-properties",
+    "transform-do-expressions",
+    { "useBuiltIns": true }
   ]
 }

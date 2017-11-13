@@ -25,7 +25,7 @@ module.exports = (BaseClass = DummyBaseClass) =>
       return path.join('src', this._resolvedPath);
     }
     get _jsEntryFilePath() {
-      return this._jsEntryPath + '.js';
+      return './' + this._jsEntryPath + '.js';
     }
     get _actionsPath() {
       return path.join('actions', this._resolvedPath);

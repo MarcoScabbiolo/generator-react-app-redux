@@ -9,13 +9,13 @@ const foo = () => e('foo', 'bar');
 describe('react-redux environment', () => {
   it('js entry', () => {
     index()._jsEntryPath.should.equal('src/index');
-    index()._jsEntryFilePath.should.equal('src/index.js');
+    index()._jsEntryFilePath.should.equal('./src/index.js');
     foo()._jsEntryPath.should.equal('src/foo/bar');
-    foo()._jsEntryFilePath.should.equal('src/foo/bar.js');
+    foo()._jsEntryFilePath.should.equal('./src/foo/bar.js');
   });
 
   it('name only', () => {
-    new (reactReduxEnvironment())('test')._jsEntryFilePath.should.equal('src/test.js');
+    new (reactReduxEnvironment())('test')._jsEntryFilePath.should.equal('./src/test.js');
   });
 
   it('actions path', () => {
