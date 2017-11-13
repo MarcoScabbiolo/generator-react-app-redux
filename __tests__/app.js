@@ -39,6 +39,15 @@ describe('generator-react-app-redux:app', () => {
     ]);
   });
 
+  describe('file contents', () => {
+    test('imports react-boostrap', () => {
+      assert.fileContent(
+        'src/components/App.js',
+        "import * as B from 'react-bootstrap';"
+      );
+    });
+  });
+
   test('dependencies', () =>
     fs.readJson('package.json').then(pkg => {
       expect(pkg.dependencies).to.include.all.keys(

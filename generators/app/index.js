@@ -4,6 +4,8 @@ const chalk = require('chalk');
 const extend = require('deep-extend');
 const sharedOptions = require('../options');
 const sharedPrompts = require('../prompts');
+const astUtils = require('../astUtils');
+const types = require('babel-types');
 
 const shared = ['bootstrap', 'thunk', 'form', 'normalizr'];
 
@@ -49,6 +51,24 @@ module.exports = class extends Generator {
   writing() {
     this.fs.copy(this.templatePath('static/**'), this.destinationRoot());
     this.fs.copy(this.templatePath('static/**/.*'), this.destinationRoot());
+
+    let component = astUtils.parse(this.fs.read(this.templatePath('component.js')));
+
+    if (this.props.bootstrap) {
+      // Include Bootstrap
+      astUtils.newImport(
+        component,
+        types.importDeclaration(
+          [types.importNamespaceSpecifier(types.identifier('B'))],
+          types.stringLiteral('react-bootstrap')
+        )
+      );
+    }
+
+    this.fs.write(
+      this.destinationPath('src/components/App.js'),
+      astUtils.generate(component)
+    );
 
     let pkg = this.fs.readJSON(this.destinationPath('package.json'), {});
     pkg = extend(pkg, this.fs.readJSON(this.templatePath('package.json'), {}));
