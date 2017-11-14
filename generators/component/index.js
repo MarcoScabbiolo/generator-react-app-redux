@@ -80,14 +80,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
     let ast = astUtils.parse(this._templateByTypeContents);
 
     if (this.props.bootstrap) {
-      // Include Bootstrap
-      astUtils.newImport(
-        ast,
-        types.importDeclaration(
-          [types.importNamespaceSpecifier(types.identifier('B'))],
-          types.stringLiteral('react-bootstrap')
-        )
-      );
+      ast = astUtils.importBootstrap(ast);
     }
 
     let exportDefaultDeclaration = astUtils.findDefaultExportDeclaration(ast);

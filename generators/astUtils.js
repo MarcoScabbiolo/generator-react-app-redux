@@ -69,6 +69,16 @@ function parse(code) {
   });
 }
 
+function importBootstrap(ast) {
+  return newImport(
+    ast,
+    types.importDeclaration(
+      [types.importNamespaceSpecifier(types.identifier('B'))],
+      types.stringLiteral('react-bootstrap')
+    )
+  );
+}
+
 module.exports = {
   parse,
   generate,
@@ -77,5 +87,6 @@ module.exports = {
   findClassDeclaration,
   findDefaultExportDeclaration,
   newImport,
-  shorthandProperty
+  shorthandProperty,
+  importBootstrap
 };

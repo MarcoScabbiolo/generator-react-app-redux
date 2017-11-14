@@ -5,7 +5,6 @@ const extend = require('deep-extend');
 const sharedOptions = require('../options');
 const sharedPrompts = require('../prompts');
 const astUtils = require('../astUtils');
-const types = require('babel-types');
 
 const shared = ['bootstrap', 'thunk', 'form', 'normalizr'];
 
@@ -69,14 +68,7 @@ module.exports = class extends Generator {
     let component = astUtils.parse(this.fs.read(this.templatePath('component.js')));
 
     if (this.props.bootstrap) {
-      // Include Bootstrap
-      astUtils.newImport(
-        component,
-        types.importDeclaration(
-          [types.importNamespaceSpecifier(types.identifier('B'))],
-          types.stringLiteral('react-bootstrap')
-        )
-      );
+      component = astUtils.importBootstrap(component);
     }
 
     this.fs.write(
