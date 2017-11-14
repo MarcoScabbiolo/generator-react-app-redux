@@ -87,6 +87,11 @@ module.exports = class extends Generator {
     if (this.props.form) {
       pkg.dependencies['redux-form'] = '^7.1.1';
     }
+    if (this.props.normalizr) {
+      pkg.dependencies.normalizr = '^3.2.4';
+    }
+
+    pkg.scripts.pretest += ' --fix';
 
     this.fs.writeJSON(this.destinationPath('package.json'), pkg);
 

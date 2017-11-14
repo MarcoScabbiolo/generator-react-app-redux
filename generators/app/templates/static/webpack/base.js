@@ -5,15 +5,16 @@ const entries = require('./entries');
 const config = require('./config.json');
 const path = require('path');
 
-var jsEntries = {}, htmlEntries = [];
+var jsEntries = {};
+var htmlEntries = [];
 
 // Process entries file
 _.forOwn(entries, (entry, name) => {
   if (typeof entry === 'string') {
     jsEntries[name] = entry;
-    htmlEntries.push(new HtmlWebpackPlugin({
-      template: `${name}.${config.defaultTemplate}`,
-    }));
+    htmlEntries.push(
+      new HtmlWebpackPlugin({ template: `${name}.${config.defaultTemplate}` })
+    );
   } else {
     if (!entry.file) {
       log.error(`Entry object ${name} is missing the file property`);
@@ -21,10 +22,13 @@ _.forOwn(entries, (entry, name) => {
     }
     jsEntries[name] = entry.file;
     if (!entry.noHTML) {
-      htmlEntries.push(new HtmlWebpackPlugin({
-        chunks: [name], title: name,
-        template: `${name}.${entry.template || config.defaultTemplate}`,
-      }));
+      htmlEntries.push(
+        new HtmlWebpackPlugin({
+          chunks: [name],
+          title: name,
+          template: `${name}.${entry.template || config.defaultTemplate}`
+        })
+      );
     }
   }
 });
@@ -33,7 +37,7 @@ const baseWebpackConfiguration = {
   entry: jsEntries,
   output: {
     filename: '[name].[hash].js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'dist')
   },
   module: {
     rules: [
@@ -46,9 +50,17 @@ const baseWebpackConfiguration = {
       }
     ]
   },
-  plugins: htmlEntries.concat([
-
-  ]),
+  resolve: {
+    extensions: ['.js', '.jsx', '.json'],
+    alias: {
+      actions: path.resolve(__dirname, '../src/actions/'),
+      components: path.resolve(__dirname, '../src/components/'),
+      containers: path.resolve(__dirname, '../src/containers/'),
+      reducers: path.resolve(__dirname, '../src/reducers/'),
+      stores: path.resolve(__dirname, '../src/stores/')
+    }
+  },
+  plugins: htmlEntries.concat([])
 };
 
 module.exports = baseWebpackConfiguration;

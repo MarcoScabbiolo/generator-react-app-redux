@@ -61,7 +61,8 @@ describe('generator-react-app-redux:app', () => {
       expect(pkg.dependencies).to.include.all.keys(
         'redux-thunk',
         'react-bootstrap',
-        'redux-form'
+        'redux-form',
+        'normalizr'
       );
     }));
 
