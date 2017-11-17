@@ -1,7 +1,6 @@
 'use strict';
 const ReactReduxGenerator = require('../ReactReduxGenerator');
 const _ = require('lodash');
-const types = require('babel-types');
 const astUtils = require('../astUtils');
 const environment = require('./Environment');
 
@@ -79,10 +78,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
       _.forIn(this.props.actions, (filePath, name) => {
         ast = astUtils.newImport(
           ast,
-          types.importDeclaration(
-            [types.importNamespaceSpecifier(types.identifier(name))],
-            types.stringLiteral(filePath)
-          )
+          astUtils.singleSpecifierImportDeclaration(name, filePath, { isNamespace: true })
         );
       });
     }
@@ -96,7 +92,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
         // Import the reducer
         ast = astUtils.newImport(
           ast,
-          astUtils.singleSpecifierImportDeclaration(name, filePath, true)
+          astUtils.singleSpecifierImportDeclaration(name, filePath, { isDefault: true })
         );
         // Combine it
         combination.push(astUtils.shorthandProperty(name));

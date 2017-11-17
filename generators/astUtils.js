@@ -12,23 +12,27 @@ function shorthandProperty(name) {
   );
 }
 
-function singleSpecifierImportDeclaration(identifier, path, isDefault = false) {
+function singleSpecifierImportDeclaration(
+  identifier,
+  path,
+  { isDefault, isNamespace } = {}
+) {
   let localIdentifier = types.identifier(
     typeof identifier === 'string' ? identifier : identifier[0]
   );
-  return types.importDeclaration(
-    [
-      isDefault
-        ? types.importDefaultSpecifier(localIdentifier)
-        : types.importSpecifier(
-            localIdentifier,
-            typeof identifier === 'string'
-              ? localIdentifier
-              : types.identifier(identifier[1])
-          )
-    ],
-    types.stringLiteral(path)
-  );
+  let specifier;
+
+  if (isDefault) {
+    specifier = types.importDefaultSpecifier(localIdentifier);
+  } else if (isNamespace) {
+    specifier = types.importNamespaceSpecifier(localIdentifier);
+  } else {
+    specifier = types.importSpecifier(
+      localIdentifier,
+      typeof identifier === 'string' ? localIdentifier : types.identifier(identifier[1])
+    );
+  }
+  return types.importDeclaration([specifier], types.stringLiteral(path));
 }
 
 function newImport(ast, importDeclaration) {

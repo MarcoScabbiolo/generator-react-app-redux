@@ -70,7 +70,6 @@ module.exports = class extends environment(ReactReduxGenerator) {
           chalk.green(this.props.name) +
           chalk.yellow(' aldready exists, you cannot override an entry')
       );
-      this.aborted = true;
       this.env.error(
         `File ${this.destinationPath(this._jsEntryFilePath)} already exists. Aborting`
       );
@@ -82,12 +81,16 @@ module.exports = class extends environment(ReactReduxGenerator) {
     // Import the main container
     ast = astUtils.newImport(
       ast,
-      astUtils.singleSpecifierImportDeclaration('Main', this._defaultContainerPath, true)
+      astUtils.singleSpecifierImportDeclaration('Main', this._defaultContainerPath, {
+        isDefault: true
+      })
     );
     // Import the store
     ast = astUtils.newImport(
       ast,
-      astUtils.singleSpecifierImportDeclaration('configureStore', this._storePath, true)
+      astUtils.singleSpecifierImportDeclaration('configureStore', this._storePath, {
+        isDefault: true
+      })
     );
 
     // Set the main container path variable to be used by HMR
