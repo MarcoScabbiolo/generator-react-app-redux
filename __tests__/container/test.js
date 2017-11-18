@@ -9,6 +9,7 @@ const chai = require('chai');
 const fs = require('fs-extra');
 const _ = require('lodash');
 
+const GENERATOR_DIR = '../../generators/container';
 const [envIndex, envFoo] = testUtils.testEnvironment(environment);
 
 function testSuite(
@@ -55,7 +56,7 @@ function testSuite(
     if (options.runGenerator) {
       test('generator completes', () =>
         helpers
-          .run(path.join(__dirname, '../../generators/container'))
+          .run(path.join(__dirname, GENERATOR_DIR))
           .withOptions(options.options)
           .withPrompts(options.prompts)
           .inTmpDir(dir => {
@@ -100,6 +101,21 @@ function testSuite(
         );
     });
   });
+
+  if (options.runGenerator) {
+    describe('generator throws with invalid input', () => {
+      test('unexistent component', () =>
+        helpers
+          .run(path.join(__dirname, GENERATOR_DIR))
+          .withOptions({ component: 'DOESNT_EXIST.js' })
+          .then(() =>
+            assert.fail('Unexistent component was passed and the generator completed')
+          )
+          .catch(err =>
+            assert.ok(err, 'Excepected an error to be thrown be the generator')
+          ));
+    });
+  }
 }
 
 module.exports = testSuite;

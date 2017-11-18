@@ -2,6 +2,7 @@ const _ = require('lodash');
 const generator = require('babel-generator');
 const babylon = require('babylon');
 const types = require('babel-types');
+const assert = require('chai').assert;
 
 function shorthandProperty(name) {
   return types.objectProperty(
@@ -83,6 +84,20 @@ function importBootstrap(ast) {
   );
 }
 
+function importAll(ast, toImport, options = {}, callback) {
+  assert.isObject(
+    toImport,
+    'second parameter (toImport) must be an object where the keys are the local identifiers and the values are the paths to import from'
+  );
+  _.forIn(toImport, (filePath, name) => {
+    ast = newImport(ast, singleSpecifierImportDeclaration(name, filePath, options));
+    if (callback) {
+      callback(name, filePath);
+    }
+  });
+  return ast;
+}
+
 module.exports = {
   parse,
   generate,
@@ -92,5 +107,6 @@ module.exports = {
   findDefaultExportDeclaration,
   newImport,
   shorthandProperty,
-  importBootstrap
+  importBootstrap,
+  importAll
 };

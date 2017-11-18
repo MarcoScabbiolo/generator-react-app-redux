@@ -88,15 +88,9 @@ module.exports = class extends environment(ReactReduxGenerator) {
       let combination = astUtils.findSingleVariableDeclaration(ast, 'const', 'reducer')
         .declarations[0].init.arguments[0].properties;
 
-      _.forIn(this.props.reducers, (filePath, name) => {
-        // Import the reducer
-        ast = astUtils.newImport(
-          ast,
-          astUtils.singleSpecifierImportDeclaration(name, filePath, { isDefault: true })
-        );
-        // Combine it
-        combination.push(astUtils.shorthandProperty(name));
-      });
+      ast = astUtils.importAll(ast, this.props.reducers, { isDefault: true }, name =>
+        combination.push(astUtils.shorthandProperty(name))
+      );
     }
 
     this.fs.write(

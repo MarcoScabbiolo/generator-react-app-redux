@@ -64,14 +64,9 @@ module.exports = class extends environment(ReactReduxGenerator) {
   }
   validating() {
     if (this.fs.exists(this.destinationPath(this._jsEntryFilePath))) {
-      this.log('');
-      this.log(
-        chalk.yellow('Entry ') +
-          chalk.green(this.props.name) +
-          chalk.yellow(' aldready exists, you cannot override an entry')
-      );
-      this.env.error(
-        `File ${this.destinationPath(this._jsEntryFilePath)} already exists. Aborting`
+      this._fileExistsError(
+        this._jsEntryFilePath,
+        chalk.yellow('Entry ') + chalk.green(this.props.name)
       );
     }
   }

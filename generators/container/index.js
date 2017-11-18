@@ -59,13 +59,10 @@ module.exports = class extends environment(ReactReduxGenerator) {
   }
   validating() {
     if (!this.fs.exists(this.props.component)) {
-      this.log('');
-      this.log(
-        chalk.yellow('Component ') +
-          chalk.red(this.props.component) +
-          chalk.yellow(' does not exist.')
+      this._fileDoesNotExistError(
+        this.props.component,
+        chalk.yellow('Component ') + chalk.red(this.props.component)
       );
-      this.env.error(`File ${this.props.component} does not exist. Aborting`);
     }
   }
   writing() {
@@ -73,12 +70,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
     let componentName = this._componentName;
 
     if (this.props.actions) {
-      _.forIn(this.props.actions, (filePath, name) => {
-        ast = astUtils.newImport(
-          ast,
-          astUtils.singleSpecifierImportDeclaration(name, filePath, { isNamespace: true })
-        );
-      });
+      ast = astUtils.importAll(ast, this.props.actions, { isNamespace: true });
     }
 
     ast = astUtils.newImport(
