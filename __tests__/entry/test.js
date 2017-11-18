@@ -12,7 +12,7 @@ const reactReduxEnvironment = require('../../generators/ReactReduxEnvironment');
 const environment = require('../../generators/entry/Environment');
 const chai = require('chai');
 
-const [envIndex, envFoo] = testUtils.testEnvironment(environment);
+const [envMain, envFoo] = testUtils.testEnvironment(environment);
 const entryInAstArray = (e, generator) =>
   e.type === 'ObjectProperty' &&
   e.key.name === generator.props.name &&
@@ -53,14 +53,14 @@ function testSuite(
         });
 
         test('html entry file path', () => {
-          chai.expect(envIndex()._htmlEntryFilePath).to.equal('index.ejs');
-          chai.expect(envFoo()._htmlEntryFilePath).to.equal('foo/bar.ejs');
+          chai.expect(envMain()._htmlEntryFilePath).to.equal('src/main.ejs');
+          chai.expect(envFoo()._htmlEntryFilePath).to.equal('src/foo/bar.ejs');
         });
 
         test('related actions', () => {
-          chai.expect(envIndex()._relatedActions).to.deep.equal({
+          chai.expect(envMain()._relatedActions).to.deep.equal({
             app: 'actions/app',
-            index: 'actions/index'
+            main: 'actions/main'
           });
           chai.expect(envFoo()._relatedActions).to.deep.equal({
             app: 'actions/app',

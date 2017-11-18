@@ -37,7 +37,7 @@ module.exports = class extends Generator {
       this.config.save();
 
       this.composeWith(require.resolve('../entry'), {
-        name: 'index',
+        name: 'main',
         bootstrap: this.props.bootstrap,
         thunk: this.props.thunk,
         normalizr: this.props.normalizr,
