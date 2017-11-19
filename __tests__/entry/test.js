@@ -1,10 +1,11 @@
-'use strict';
+('use strict');
 const path = require('path');
 const assert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 const astUtils = require('../../generators/astUtils');
 const testUtils = require('../_utils/testUtils');
 const fs = require('fs-extra');
+const action = require('../action/test');
 const store = require('../store/test');
 const reducer = require('../reducer/test');
 const component = require('../component/test');
@@ -104,6 +105,14 @@ function testSuite(
     test('adds entry', () => {
       if (fs.existsSync('webpack/entries.js')) {
         assertAddedEntry(generator);
+      }
+    });
+
+    action({
+      runGenerator: false,
+      options: {
+        name: generator.props.name,
+        path: generator.props.path
       }
     });
 
