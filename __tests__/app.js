@@ -54,7 +54,11 @@ describe('generator-react-app-redux:app', () => {
       );
       assert.fileContent(
         'src/components/App.js',
-        "require('bootstrap/' + bootstrapConfig.sass);"
+        "import '../../node_modules/bootstrap/dist/css/bootstrap.css';"
+      );
+      assert.fileContent(
+        'src/components/App.js',
+        "import '../../node_modules/bootstrap/dist/css/bootstrap-theme.css';"
       );
     });
 

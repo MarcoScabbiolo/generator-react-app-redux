@@ -72,10 +72,16 @@ module.exports = class extends Generator {
       component = astUtils.importBootstrap(component);
       component = astUtils.newImport(
         component,
-        astUtils.singleSpecifierImportDeclaration(
-          'bootstrapConfig',
-          'bootstrap/package',
-          { isDefault: true }
+        types.importDeclaration(
+          [],
+          types.stringLiteral('../../node_modules/bootstrap/dist/css/bootstrap.css')
+        )
+      );
+      component = astUtils.newImport(
+        component,
+        types.importDeclaration(
+          [],
+          types.stringLiteral('../../node_modules/bootstrap/dist/css/bootstrap-theme.css')
         )
       );
       component.program.body.splice(
@@ -105,7 +111,7 @@ module.exports = class extends Generator {
 
     if (this.props.bootstrap) {
       pkg.dependencies['react-bootstrap'] = '^0.31.3';
-      pkg.dependencies.bootstrap = '^4.0.0-beta.2';
+      pkg.dependencies.bootstrap = '^3.3.7';
     }
     if (this.props.thunk) {
       pkg.dependencies['redux-thunk'] = '^2.2.0';
