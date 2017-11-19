@@ -36,9 +36,12 @@ function singleSpecifierImportDeclaration(
   return types.importDeclaration([specifier], types.stringLiteral(path));
 }
 
+function lastImportIndex(ast) {
+  return _.findLastIndex(ast.body, types.isImportDeclaration) + 1;
+}
+
 function newImport(ast, importDeclaration) {
-  let index = _.findLastIndex(ast.body, types.isImportDeclaration) + 1;
-  ast.program.body.splice(index, 0, importDeclaration);
+  ast.program.body.splice(lastImportIndex(ast), 0, importDeclaration);
   return ast;
 }
 
@@ -105,6 +108,7 @@ module.exports = {
   findSingleVariableDeclaration,
   findClassDeclaration,
   findDefaultExportDeclaration,
+  lastImportIndex,
   newImport,
   shorthandProperty,
   importBootstrap,
