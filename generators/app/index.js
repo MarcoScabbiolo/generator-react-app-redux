@@ -6,12 +6,19 @@ const sharedOptions = require('../options');
 const sharedPrompts = require('../prompts');
 const astUtils = require('../astUtils');
 const types = require('babel-types');
+const _ = require('lodash');
 
 const shared = ['bootstrap', 'thunk', 'form', 'normalizr'];
 
 module.exports = class extends Generator {
   constructor(args, options) {
     super(args, options);
+
+    this.option('webpackdashboard', {
+      type: Boolean,
+      required: false,
+      desc: 'Use webpack-dashboard'
+    });
 
     sharedOptions.include(this.option.bind(this), shared, this.log.bind(this));
   }
@@ -28,7 +35,17 @@ module.exports = class extends Generator {
     this.log(chalk.green('React & Redux') + ' generator. Feel free to contribute!');
     this.log('');
 
-    return this.prompt(sharedPrompts.get(this.props, shared)).then(props => {
+    return this.prompt(
+      sharedPrompts.get(this.props, shared).concat([
+        {
+          name: 'webpackdashboard',
+          type: 'confirm',
+          default: false,
+          store: true,
+          when: !_.isBoolean(this.options.webpackdashboard)
+        }
+      ])
+    ).then(props => {
       this.props = extend(this.props, props);
       this.config.set({
         bootstrapEnabled: this.props.bootstrap,
@@ -109,6 +126,11 @@ module.exports = class extends Generator {
 
     let pkg = this._extendJSON('package.json', undefined, false);
 
+    if (this.props.webpackdashboard) {
+      pkg.devDependencies['webpack-dashboard'] = '^1.0.2';
+      pkg.scripts.start = 'webpack-dashboard -- ' + pkg.scripts.start;
+    }
+
     if (this.props.bootstrap) {
       pkg.dependencies['react-bootstrap'] = '^0.31.3';
       pkg.dependencies.bootstrap = '^3.3.7';
@@ -126,6 +148,10 @@ module.exports = class extends Generator {
     pkg.scripts.pretest += ' --fix';
 
     this.fs.writeJSON(this.destinationPath('package.json'), pkg);
+
+    let webpack = this.fs.readJSON(this.templatePath('webpack-config.json'), {});
+    webpack.dashboard = this.props.webpackdashboard;
+    this.fs.writeJSON(this.destinationPath('webpack/config.json'), webpack);
 
     this._extendJSON('.babelrc');
   }
