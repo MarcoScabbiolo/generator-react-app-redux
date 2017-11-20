@@ -24,11 +24,6 @@ module.exports = class extends Generator {
   }
   initializing() {
     this.props = Object.assign({}, this.options);
-    this.composeWith(require.resolve('generator-node/generators/app'), {
-      boilerplate: false,
-      skipInstall: this.options.skipInstall,
-      license: this.options.license
-    });
   }
   prompting() {
     this.log('');
@@ -54,16 +49,22 @@ module.exports = class extends Generator {
         formsEnabled: this.props.form
       });
       this.config.save();
-
-      this.composeWith(require.resolve('../entry'), {
-        name: 'main',
-        bootstrap: this.props.bootstrap,
-        thunk: this.props.thunk,
-        normalizr: this.props.normalizr,
-        form: this.props.form,
-        path: '',
-        skipEntryDirectory: true
-      });
+    });
+  }
+  default() {
+    this.composeWith(require.resolve('generator-node/generators/app'), {
+      boilerplate: false,
+      skipInstall: this.options.skipInstall,
+      license: this.options.license
+    });
+    this.composeWith(require.resolve('../entry'), {
+      name: 'main',
+      bootstrap: this.props.bootstrap,
+      thunk: this.props.thunk,
+      normalizr: this.props.normalizr,
+      form: this.props.form,
+      path: '',
+      skipEntryDirectory: true
     });
   }
   _extendJSON(target, source, write = true) {
@@ -130,7 +131,12 @@ module.exports = class extends Generator {
       pkg.dependencies.normalizr = '^3.2.4';
     }
 
-    pkg.scripts.pretest += ' --fix';
+    pkg.eslintConfig = {
+      parser: 'babel-eslint',
+      env: {
+        browser: true
+      }
+    };
 
     this.fs.writeJSON(this.destinationPath('package.json'), pkg);
 
@@ -139,9 +145,5 @@ module.exports = class extends Generator {
     this.fs.writeJSON(this.destinationPath('webpack/config.json'), webpack);
 
     this._extendJSON('.babelrc');
-  }
-
-  install() {
-    this.installDependencies({ bower: false });
   }
 };
