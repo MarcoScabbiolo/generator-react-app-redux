@@ -83,7 +83,6 @@ module.exports = class extends Generator {
   }
   writing() {
     this.fs.copy(this.templatePath('static/**'), this.destinationRoot());
-    this.fs.copy(this.templatePath('static/**/.*'), this.destinationRoot());
 
     let component = astUtils.parse(this.fs.read(this.templatePath('component.js')));
 
@@ -145,5 +144,9 @@ module.exports = class extends Generator {
     this.fs.writeJSON(this.destinationPath('webpack/config.json'), webpack);
 
     this._extendJSON('.babelrc');
+
+    let gitignore = this.fs.read(this.destinationPath('.gitignore'));
+    gitignore += '\ndist/*';
+    this.fs.write(this.destinationPath('.gitignore'), gitignore);
   }
 };

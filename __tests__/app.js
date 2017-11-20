@@ -67,6 +67,10 @@ describe('generator-react-app-redux:app', () => {
     test('imports react-boostrap', assertAppComponentBootstrapFileContents());
 
     test('babelrc', () => fs.readJson('.babelrc').then(assertBabelrc));
+    test('gitignore', () =>
+      fs
+        .readFile('.gitignore', 'utf-8')
+        .then(contents => expect(contents.indexOf('dist/*')).not.to.equal(-1)));
 
     test('dependencies', () =>
       fs.readJson('package.json').then(pkg => {
