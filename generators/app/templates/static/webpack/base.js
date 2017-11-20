@@ -65,6 +65,12 @@ const baseWebpackConfiguration = {
               options: {
                 sourceMap: development
               }
+            },
+            {
+              loader: "postcss-loader",
+              options: {
+                plugins: development ? undefined : [require('autoprefixer')()]
+              }
             }
           ],
           fallback: "style-loader"
@@ -77,8 +83,16 @@ const baseWebpackConfiguration = {
             { 
               loader: "css-loader", 
               options: {
-                sourceMap: development
+                sourceMap: development,
+                minimize: !development
               } 
+            },
+            {
+              loader: "postcss-loader",
+              options: {
+                sourceMap: development,
+                plugins: development ? undefined : [require('autoprefixer')()]
+              }
             },
             { 
               loader: "sass-loader",
