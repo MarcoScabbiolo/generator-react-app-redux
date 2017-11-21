@@ -146,7 +146,7 @@ module.exports = class extends Generator {
     this._extendJSON('.babelrc');
 
     let gitignore = this.fs.read(this.destinationPath('.gitignore'));
-    gitignore += '\ndist/*';
+    gitignore += 'dist/*\n';
     this.fs.write(this.destinationPath('.gitignore'), gitignore);
   }
 };
