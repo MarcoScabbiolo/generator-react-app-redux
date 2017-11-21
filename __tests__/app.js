@@ -58,8 +58,7 @@ describe('generator-react-app-redux:app', () => {
       '.babelrc',
       '.gitignore',
       'webpack.config.js',
-      'package.json',
-      'dist'
+      'package.json'
     ]);
   });
 
