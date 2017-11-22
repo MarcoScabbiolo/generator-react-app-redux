@@ -1,7 +1,22 @@
 const path = require('path');
 const _ = require('lodash');
+const types = require('babel-types');
 
 class DummyBaseClass {}
+
+const filePathArray = path => path.split('/').filter(s => /[a-zA-z]+/g.test(s));
+
+const filePathToObjectNotation = path => filePathArray(path).join('.');
+const filePathToObjectNotationAst = path => {
+  let array = filePathArray(path);
+  return array.reduce(
+    (acc, next) => types.memberExpression(acc, types.identifier(next)),
+    types.memberExpression(
+      types.identifier(array.shift()),
+      types.identifier(array.shift())
+    )
+  );
+};
 
 module.exports = (BaseClass = DummyBaseClass) =>
   class extends BaseClass {
@@ -68,6 +83,12 @@ module.exports = (BaseClass = DummyBaseClass) =>
     }
     get _defaultContainerFilePath() {
       return path.join('src', this._defaultContainerPath, 'index.js');
+    }
+    _pathToReducerObjectNotation(base = '') {
+      return filePathToObjectNotation(path.join('state', base, this._resolvedPath));
+    }
+    _pathToReducerObjectNotationAst(base = '') {
+      return filePathToObjectNotationAst(path.join('state', base, this._resolvedPath));
     }
     _resolvePath(toJoin = '') {
       return path.join(this._resolvedPath, toJoin);

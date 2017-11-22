@@ -81,14 +81,16 @@ module.exports = class extends environment(ReactReduxGenerator) {
       desc: 'Include a stylesheet with this component'
     });
   }
+  get _componentName() {
+    return this.props.type === 'stateless'
+      ? _.lowerFirst(this.props.name)
+      : _.upperFirst(this.props.name);
+  }
   initializing() {
     return this._initializing();
   }
   prompting() {
     return this._prompting();
-  }
-  get _componentName() {
-    return _.upperFirst(this.props.name);
   }
   writing() {
     let ast = astUtils.parse(this._templateByTypeContents);
@@ -112,7 +114,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
         ast,
         'const',
         'newComponent'
-      ).declarations[0].id.name = this.props.name;
+      ).declarations[0].id.name = this._componentName;
 
       // Change displayName
       let displayNameExpression = ast.program.body.find(
@@ -123,11 +125,11 @@ module.exports = class extends environment(ReactReduxGenerator) {
           stmt.expression.left.object.name === 'newComponent'
       ).expression;
 
-      displayNameExpression.left.object.name = this.props.name;
-      displayNameExpression.right.value = this._componentName;
-      displayNameExpression.right.raw = `'${this._componentName}'`;
+      displayNameExpression.left.object.name = this._componentName;
+      displayNameExpression.right.value = _.upperFirst(this._componentName);
+      displayNameExpression.right.raw = `'${_.upperFirst(this._componentName)}'`;
 
-      exportDefaultDeclaration.declaration.name = this.props.name;
+      exportDefaultDeclaration.declaration.name = this._componentName;
     } else {
       // Change class name
       astUtils.findClassDeclaration(ast, 'NewComponent').id.name = this._componentName;
@@ -148,10 +150,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
       let state;
 
       if (this.props.type === 'section') {
-        state = types.memberExpression(
-          types.memberExpression(types.identifier('state'), types.identifier('sections')),
-          types.identifier(this.props.path)
-        );
+        state = this._pathToReducerObjectNotationAst('sections');
       }
 
       this.composeWith(require.resolve('../container'), {

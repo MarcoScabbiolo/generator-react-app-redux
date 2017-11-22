@@ -24,6 +24,7 @@ module.exports = class extends Generator {
   }
   initializing() {
     this.props = Object.assign({}, this.options);
+    this.log('Scaffolding in ' + chalk.yellow(this.destinationPath()));
   }
   prompting() {
     this.log('');
