@@ -5,7 +5,7 @@ const types = require('babel-types');
 const astUtils = require('../astUtils');
 const environment = require('./Environment');
 
-const shared = ['path', 'bootstrap'];
+const shared = ['path', 'bootstrap', 'reacthocloading'];
 const prompts = [
   {
     name: 'name',
@@ -107,6 +107,23 @@ module.exports = class extends environment(ReactReduxGenerator) {
     }
 
     let exportDefaultDeclaration = astUtils.findDefaultExportDeclaration(ast);
+
+    if (this.props.type === 'section' && this.props.reacthocloading) {
+      astUtils.newImport(
+        ast,
+        astUtils.singleSpecifierImportDeclaration('Loading', 'react-hoc-loading', {
+          isDefault: true
+        })
+      );
+
+      let classDeclaration = astUtils.findClassDeclaration(ast, 'NewComponent');
+      if (!classDeclaration.decorators) {
+        classDeclaration.decorators = [];
+      }
+      classDeclaration.decorators.push(
+        types.decorator(types.callExpression(types.identifier('Loading')))
+      );
+    }
 
     if (this.props.type === 'stateless') {
       // Change function name

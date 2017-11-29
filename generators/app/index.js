@@ -8,7 +8,7 @@ const astUtils = require('../astUtils');
 const types = require('babel-types');
 const _ = require('lodash');
 
-const shared = ['bootstrap', 'thunk', 'form', 'normalizr'];
+const shared = ['bootstrap', 'thunk', 'form', 'normalizr', 'reacthocloading'];
 
 module.exports = class extends Generator {
   constructor(args, options) {
@@ -64,6 +64,7 @@ module.exports = class extends Generator {
       thunk: this.props.thunk,
       normalizr: this.props.normalizr,
       form: this.props.form,
+      reacthocloading: this.props.reacthocloading,
       path: '',
       skipEntryDirectory: true
     });
@@ -129,6 +130,15 @@ module.exports = class extends Generator {
     }
     if (this.props.normalizr) {
       pkg.dependencies.normalizr = '^3.2.4';
+    }
+    if (this.props.reacthocloading) {
+      pkg.dependencies['react-hoc-loading'] = '^1.0.2';
+
+      this.log(
+        `Dont forget to set your ${chalk.yellow(
+          'default LoadingComponent'
+        )}: https://github.com/MarcoScabbiolo/react-hoc-loading#set-a-default-loadingcomponent-globally-with-setdefaultloadingcomponent`
+      );
     }
 
     pkg.eslintConfig = {

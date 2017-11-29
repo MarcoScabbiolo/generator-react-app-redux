@@ -37,6 +37,14 @@ const prompts = [
     default: false,
     store: true,
     when: props => !_.isBoolean(props.normalizr)
+  },
+  {
+    message: 'Use a HOC for components that can be loading?',
+    name: 'reacthocloading',
+    type: 'confirm',
+    default: false,
+    store: true,
+    when: props => props.type === 'section' || !_.isBoolean(props.reacthocloading)
   }
 ];
 

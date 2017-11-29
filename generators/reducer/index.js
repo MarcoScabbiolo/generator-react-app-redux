@@ -3,8 +3,9 @@ const ReactReduxGenerator = require('../ReactReduxGenerator');
 const _ = require('lodash');
 const astUtils = require('../astUtils');
 const environment = require('./Environment');
+const types = require('babel-types');
 
-const shared = ['path'];
+const shared = ['path', 'reacthocloading'];
 const prompts = [
   {
     name: 'name',
@@ -97,6 +98,35 @@ module.exports = class extends environment(ReactReduxGenerator) {
 
     this.fs.write(destinationPath, astUtils.generate(ast));
   }
+  _emptyActionsArrayConstDeclaration(identifier) {
+    return types.variableDeclaration('const', [
+      types.variableDeclarator(types.identifier(identifier), types.arrayExpression([]))
+    ]);
+  }
+  _ifIncludesReplaceBaseStateBlock(declaration, alternate = undefined) {
+    return types.ifStatement(
+      types.callExpression(
+        types.memberExpression(
+          types.identifier(declaration.arrayIdentifier),
+          types.identifier('includes')
+        ),
+        types.memberExpression(types.identifier('action'), types.identifier('type'))
+      ),
+      types.blockStatement([
+        types.expressionStatement(
+          types.assignmentExpression(
+            '=',
+            types.identifier('state'),
+            types.objectExpression([
+              types.spreadProperty(types.identifier('state')),
+              ...declaration.properties
+            ])
+          )
+        )
+      ]),
+      alternate
+    );
+  }
   writing() {
     let ast = astUtils.parse(this._templateByTypeContents);
 
@@ -121,6 +151,44 @@ module.exports = class extends environment(ReactReduxGenerator) {
 
     if (this.props.type === 'section') {
       this._addSection();
+
+      if (this.props.reacthocloading) {
+        ast.body.unshift(
+          this._emptyActionsArrayConstDeclaration('loadingActions'),
+          this._emptyActionsArrayConstDeclaration('notLoadingActions')
+        );
+
+        astUtils
+          .findSingleVariableDeclaration(ast, 'const', 'initialState')
+          .declarations.init.properties.push(
+            types.objectProperty(types.identifier('loading'), types.booleanLiteral(false))
+          );
+
+        astUtils
+          .findSingleVariableDeclaration(ast, 'const', 'reducer')
+          .declarations.init.body.unshift(
+            this._ifIncludesReplaceBaseStateBlock(
+              {
+                arrayIdentifier: 'loadingActions',
+                properties: [
+                  types.objectProperty(
+                    types.identifier('loading'),
+                    types.booleanLiteral(true)
+                  )
+                ]
+              },
+              this._ifIncludesReplaceBaseStateBlock({
+                arrayIdentifier: 'notLoadingActions',
+                properties: [
+                  types.objectProperty(
+                    types.identifier('loading'),
+                    types.booleanLiteral(false)
+                  )
+                ]
+              })
+            )
+          );
+      }
     }
 
     this.fs.write(

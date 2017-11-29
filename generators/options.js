@@ -28,6 +28,11 @@ const options = {
     type: Boolean,
     required: false,
     desc: 'Use normalizr'
+  },
+  reacthocloading: {
+    type: Boolean,
+    required: false,
+    desc: 'Use a HOC to set components to be loading with react-hoc-loading'
   }
 };
 

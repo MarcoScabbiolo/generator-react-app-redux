@@ -6,7 +6,7 @@ const assert = require('chai').assert;
 const types = require('babel-types');
 const astUtils = require('../astUtils');
 
-const shared = ['bootstrap', 'thunk', 'path', 'normalizr', 'form'];
+const shared = ['bootstrap', 'thunk', 'path', 'normalizr', 'form', 'reacthocloading'];
 const prompts = [
   {
     name: 'name',
