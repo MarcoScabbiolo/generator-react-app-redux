@@ -36,6 +36,12 @@ module.exports = (BaseClass = DummyBaseClass) =>
     get _resolvedPath() {
       return path.join(this.props.path, this.props.name);
     }
+    get _resolvedPathExcludingIndex() {
+      return path.join(
+        this.props.path,
+        this.props.name === 'index' ? '' : this.props.name
+      );
+    }
     get _jsEntryPath() {
       return path.join('src', this._resolvedPath);
     }
@@ -85,10 +91,14 @@ module.exports = (BaseClass = DummyBaseClass) =>
       return path.join('src', this._defaultContainerPath, 'index.js');
     }
     _pathToReducerObjectNotation(base = '') {
-      return filePathToObjectNotation(path.join('state', base, this._resolvedPath));
+      return filePathToObjectNotation(
+        path.join('state', base, this._resolvedPathExcludingIndex)
+      );
     }
     _pathToReducerObjectNotationAst(base = '') {
-      return filePathToObjectNotationAst(path.join('state', base, this._resolvedPath));
+      return filePathToObjectNotationAst(
+        path.join('state', base, this._resolvedPathExcludingIndex)
+      );
     }
     _resolvePath(toJoin = '') {
       return path.join(this._resolvedPath, toJoin);

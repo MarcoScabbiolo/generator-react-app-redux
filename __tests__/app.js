@@ -117,7 +117,8 @@ describe('generator-react-app-redux:app:2', () => {
         form: false,
         normalizr: false,
         thunk: false,
-        dashboard: false
+        dashboard: false,
+        reacthocloading: false
       })
       .withGenerators(dummyDependencies)
       .inTmpDir(dir => {
@@ -163,7 +164,8 @@ describe('generator-react-app-redux:app:2', () => {
       normalizr: false,
       thunk: false,
       path: '',
-      skipEntryDirectory: true
+      skipEntryDirectory: true,
+      reacthocloading: false
     },
     prompts: {}
   });

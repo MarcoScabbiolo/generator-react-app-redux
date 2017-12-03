@@ -22,7 +22,8 @@ module.exports = class extends environment(ReactReduxGenerator) {
     super(args, options, {
       shared,
       prompts,
-      generatorName: 'Entry'
+      generatorName: 'Entry',
+      logScaffoldingPath: options.verbose || true
     });
 
     this.option('skipEntryDirectory', {
@@ -40,7 +41,8 @@ module.exports = class extends environment(ReactReduxGenerator) {
     return this._prompting().then(() => {
       this.composeWith(require.resolve('../action'), {
         name: this.props.name,
-        path: this.props.path
+        path: this.props.path,
+        logScaffoldingPath: false
       });
 
       this.composeWith(require.resolve('../store'), {
@@ -48,7 +50,8 @@ module.exports = class extends environment(ReactReduxGenerator) {
         thunk: this.props.thunk,
         normalizr: this.props.normalizr,
         form: this.props.form,
-        path: this.props.path
+        path: this.props.path,
+        logScaffoldingPath: false
       });
 
       this.composeWith(require.resolve('../reducer'), {
@@ -56,17 +59,20 @@ module.exports = class extends environment(ReactReduxGenerator) {
         path: this.props.path,
         reacthocloading: this.props.reacthocloading,
         type: 'section',
-        actions: this._relatedActions
+        actions: this._relatedActions,
+        logScaffoldingPath: false
       });
 
       this.composeWith(require.resolve('../component'), {
         name: 'index',
+        componentname: this.props.name,
         path: this.props.name,
         bootstrap: this.props.bootstrap,
         reacthocloading: this.props.reacthocloading,
         container: true,
         type: 'section',
-        stylesheet: true
+        stylesheet: true,
+        logScaffoldingPath: false
       });
     });
   }

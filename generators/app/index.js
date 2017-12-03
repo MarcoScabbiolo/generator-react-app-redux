@@ -66,7 +66,8 @@ module.exports = class extends Generator {
       form: this.props.form,
       reacthocloading: this.props.reacthocloading,
       path: '',
-      skipEntryDirectory: true
+      skipEntryDirectory: true,
+      logScaffoldingPath: false
     });
   }
   _extendJSON(target, source, write = true) {

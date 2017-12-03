@@ -44,7 +44,8 @@ const prompts = [
     type: 'confirm',
     default: false,
     store: true,
-    when: props => props.type === 'section' || !_.isBoolean(props.reacthocloading)
+    when: props =>
+      !_.isBoolean(props.reacthocloading) && (!props.type || props.type === 'section')
   }
 ];
 

@@ -68,6 +68,16 @@ function findDefaultExportDeclaration(ast) {
   return ast.program.body.find(types.isExportDefaultDeclaration);
 }
 
+function findClassMethodDeclaration(classDeclaration, method) {
+  return classDeclaration.body.body.find(
+    stmt => types.isClassMethod(stmt) && stmt.key.name === method
+  );
+}
+
+function findReturnStatement(body) {
+  return body.find(types.isReturnStatement);
+}
+
 function generate(ast) {
   return prettier.format(
     generator.default(ast, { quotes: 'single' }).code,
@@ -113,6 +123,8 @@ module.exports = {
   findSingleVariableDeclaration,
   findClassDeclaration,
   findDefaultExportDeclaration,
+  findClassMethodDeclaration,
+  findReturnStatement,
   lastImportIndex,
   newImport,
   shorthandProperty,

@@ -97,7 +97,7 @@ function testSuite(
       testFalse: 'does not import react-hoc-loading',
       prop: generator.props.reacthocloading,
       file: generator._componentToCreateFilePath,
-      content: `import Loading from 'react-hoc-loading';`
+      content: `import loading from 'react-hoc-loading';`
     });
 
     testUtils.testFileContentsByProp({
@@ -105,7 +105,7 @@ function testSuite(
       testFalse: 'does not add the Loading decorator',
       prop: generator.props.reacthocloading,
       file: generator._componentToCreateFilePath,
-      content: `@Loading()`
+      content: `@loading()`
     });
   });
 

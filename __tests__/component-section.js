@@ -10,6 +10,7 @@ component({
     container: false
   },
   options: {
-    bootstrap: true
+    bootstrap: true,
+    reacthocloading: false
   }
 });

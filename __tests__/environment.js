@@ -153,10 +153,10 @@ describe('react-redux environment', () => {
   test('resolve reducer object notation', () => {
     index()
       ._pathToReducerObjectNotation()
-      .should.equal('state.index');
+      .should.equal('state');
     index()
       ._pathToReducerObjectNotation('sections')
-      .should.equal('state.sections.index');
+      .should.equal('state.sections');
     foo()
       ._pathToReducerObjectNotation()
       .should.equal('state.foo.bar');

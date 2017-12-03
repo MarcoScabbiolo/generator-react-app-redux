@@ -80,11 +80,33 @@ module.exports = class extends environment(ReactReduxGenerator) {
       required: false,
       desc: 'Include a stylesheet with this component'
     });
+    this.option('componentname', {
+      type: String,
+      required: false,
+      desc: 'Provide a component name to be used instead of the name option/prompt'
+    });
   }
   get _componentName() {
-    return this.props.type === 'stateless'
-      ? _.lowerFirst(this.props.name)
-      : _.upperFirst(this.props.name);
+    let name = this.props.componentname || this.props.name;
+    return this.props.type === 'stateless' ? _.lowerFirst(name) : _.upperFirst(name);
+  }
+  _renderMethod(classDeclaration) {
+    return astUtils.findClassMethodDeclaration(classDeclaration, 'render');
+  }
+  _divElement(children = []) {
+    return types.jSXElement(
+      types.jSXOpeningElement(types.jSXIdentifier('div'), []),
+      types.jSXClosingElement(types.jSXIdentifier('div')),
+      children
+    );
+  }
+  _thisRenderLoading(args = []) {
+    return types.jSXExpressionContainer(
+      types.callExpression(
+        types.memberExpression(types.thisExpression(), types.identifier('renderLoading')),
+        args
+      )
+    );
   }
   initializing() {
     return this._initializing();
@@ -111,7 +133,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
     if (this.props.type === 'section' && this.props.reacthocloading) {
       astUtils.newImport(
         ast,
-        astUtils.singleSpecifierImportDeclaration('Loading', 'react-hoc-loading', {
+        astUtils.singleSpecifierImportDeclaration('loading', 'react-hoc-loading', {
           isDefault: true
         })
       );
@@ -121,8 +143,16 @@ module.exports = class extends environment(ReactReduxGenerator) {
         classDeclaration.decorators = [];
       }
       classDeclaration.decorators.push(
-        types.decorator(types.callExpression(types.identifier('Loading'), []))
+        types.decorator(types.callExpression(types.identifier('loading'), []))
       );
+
+      let returnStmt = astUtils.findReturnStatement(
+        this._renderMethod(classDeclaration).body.body
+      );
+
+      if (types.isNullLiteral(returnStmt.argument)) {
+        returnStmt.argument = this._divElement([this._thisRenderLoading()]);
+      }
     }
 
     if (this.props.type === 'stateless') {
@@ -174,7 +204,8 @@ module.exports = class extends environment(ReactReduxGenerator) {
         name: this.props.name,
         path: this.props.path,
         component: this._componentToCreateFilePath,
-        state
+        state,
+        logScaffoldingPath: false
       });
     }
   }

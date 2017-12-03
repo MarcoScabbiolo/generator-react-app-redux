@@ -45,7 +45,9 @@ module.exports = class extends reactReduxEnvironment(Generator) {
   }
   _initializing() {
     this.props = Object.assign({}, this.options, this.props);
-    this.log('Scaffolding in ' + chalk.yellow(this.destinationPath()));
+    if (this.props.logScaffoldingPath) {
+      this.log('Scaffolding in ' + chalk.yellow(this.destinationPath()));
+    }
   }
   _prompting() {
     var that = this;

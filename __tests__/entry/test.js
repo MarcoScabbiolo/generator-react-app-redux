@@ -143,7 +143,8 @@ function testSuite(
         path: generator.props.name,
         type: 'section',
         stylesheet: true,
-        reacthocloading: generator.props.reacthocloading
+        reacthocloading: generator.props.reacthocloading,
+        componentname: generator.props.name
       }
     });
   });
