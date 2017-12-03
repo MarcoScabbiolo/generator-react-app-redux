@@ -54,6 +54,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
       this.composeWith(require.resolve('../reducer'), {
         name: this.props.name,
         path: this.props.path,
+        reacthocloading: this.props.reacthocloading,
         type: 'section',
         actions: this._relatedActions
       });
@@ -62,6 +63,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
         name: 'index',
         path: this.props.name,
         bootstrap: this.props.bootstrap,
+        reacthocloading: this.props.reacthocloading,
         container: true,
         type: 'section',
         stylesheet: true

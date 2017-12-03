@@ -78,7 +78,7 @@ function generate(ast) {
 function parse(code) {
   return babylon.parse(code, {
     sourceType: 'module',
-    plugins: ['jsx', 'objectRestSpread', 'classProperties']
+    plugins: ['jsx', 'objectRestSpread', 'classProperties', 'decorators']
   });
 }
 

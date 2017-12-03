@@ -39,7 +39,8 @@ describe('generator-react-app-redux:app', () => {
         bootstrap: true,
         form: true,
         normalizr: true,
-        webpackdashboard: true
+        webpackdashboard: true,
+        reacthocloading: true
       })
       .withGenerators(dummyDependencies));
 
@@ -99,7 +100,8 @@ describe('generator-react-app-redux:app', () => {
       normalizr: true,
       thunk: true,
       path: '',
-      skipEntryDirectory: true
+      skipEntryDirectory: true,
+      reacthocloading: true
     },
     prompts: {}
   });

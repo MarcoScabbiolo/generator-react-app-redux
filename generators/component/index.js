@@ -121,7 +121,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
         classDeclaration.decorators = [];
       }
       classDeclaration.decorators.push(
-        types.decorator(types.callExpression(types.identifier('Loading')))
+        types.decorator(types.callExpression(types.identifier('Loading'), []))
       );
     }
 

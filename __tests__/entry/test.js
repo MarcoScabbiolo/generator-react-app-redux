@@ -38,7 +38,8 @@ function testSuite(
     options: {
       skipEntryDirectory: false,
       path: 'generator_tests',
-      name: 'test'
+      name: 'test',
+      reacthocloading: false
     }
   },
   testEnvironment = false
@@ -129,7 +130,8 @@ function testSuite(
         name: generator.props.name,
         path: generator.props.path,
         type: 'section',
-        actions: generator._relatedActions
+        actions: generator._relatedActions,
+        reacthocloading: generator.props.reacthocloading
       }
     });
 
@@ -140,7 +142,8 @@ function testSuite(
         name: 'index',
         path: generator.props.name,
         type: 'section',
-        stylesheet: true
+        stylesheet: true,
+        reacthocloading: generator.props.reacthocloading
       }
     });
   });

@@ -22,7 +22,9 @@ function testSuite(
       bootstrap: true,
       stylesheet: false
     },
-    options: {}
+    options: {
+      reacthocloading: false
+    }
   },
   testEnvironment = false
 ) {
@@ -88,6 +90,22 @@ function testSuite(
       prop: generator.props.stylesheet,
       file: generator._componentToCreateFilePath,
       content: `import './${generator.props.name}.scss';`
+    });
+
+    testUtils.testFileContentsByProp({
+      testTrue: 'imports react-hoc-loading',
+      testFalse: 'does not import react-hoc-loading',
+      prop: generator.props.reacthocloading,
+      file: generator._componentToCreateFilePath,
+      content: `import Loading from 'react-hoc-loading';`
+    });
+
+    testUtils.testFileContentsByProp({
+      testTrue: 'adds the Loading decorator',
+      testFalse: 'does not add the Loading decorator',
+      prop: generator.props.reacthocloading,
+      file: generator._componentToCreateFilePath,
+      content: `@Loading()`
     });
   });
 

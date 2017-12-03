@@ -20,6 +20,7 @@ function testSuite(
       path: 'generator_tests'
     },
     options: {
+      reacthocloading: false,
       actions: {
         app: 'actions/app',
         other: 'actions/other'
@@ -97,6 +98,19 @@ function testSuite(
           `import ${generator.props.name} from '${generator._reducerToCreatePath}';`
         );
       });
+
+      if (generator.props.reacthocloading) {
+        test('adds the actions arrays', () => {
+          assert.fileContent(
+            generator._reducerToCreateFilePath,
+            `const loadingActions = [];`
+          );
+          assert.fileContent(
+            generator._reducerToCreateFilePath,
+            `const notLoadingActions = [];`
+          );
+        });
+      }
     }
   });
 }

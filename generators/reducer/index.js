@@ -110,7 +110,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
           types.identifier(declaration.arrayIdentifier),
           types.identifier('includes')
         ),
-        types.memberExpression(types.identifier('action'), types.identifier('type'))
+        [types.memberExpression(types.identifier('action'), types.identifier('type'))]
       ),
       types.blockStatement([
         types.expressionStatement(
@@ -153,20 +153,20 @@ module.exports = class extends environment(ReactReduxGenerator) {
       this._addSection();
 
       if (this.props.reacthocloading) {
-        ast.body.unshift(
+        ast.program.body.unshift(
           this._emptyActionsArrayConstDeclaration('loadingActions'),
           this._emptyActionsArrayConstDeclaration('notLoadingActions')
         );
 
         astUtils
           .findSingleVariableDeclaration(ast, 'const', 'initialState')
-          .declarations.init.properties.push(
+          .declarations[0].init.properties.push(
             types.objectProperty(types.identifier('loading'), types.booleanLiteral(false))
           );
 
         astUtils
           .findSingleVariableDeclaration(ast, 'const', 'reducer')
-          .declarations.init.body.unshift(
+          .declarations[0].init.body.body.unshift(
             this._ifIncludesReplaceBaseStateBlock(
               {
                 arrayIdentifier: 'loadingActions',
