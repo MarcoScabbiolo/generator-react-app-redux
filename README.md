@@ -20,6 +20,7 @@ Optionally
 - [Thunks][redux-thunk]
 - Data normalization with [normalizr][normalizr]
 - [Redux form][redux-form]
+- [HOC to set React components to be loading][react-hoc-loading]
 - [Webpack Dashboard][webpack-dashboard]
 
 ## Install
@@ -66,4 +67,5 @@ If there's something you don't like about the generated proyect [please share yo
 [redux-thunk]: https://redux.js.org/docs/advanced/AsyncActions.html#async-action-creators
 [redux-form]: https://redux-form.com/7.1.2/
 [normalizr]: https://github.com/paularmstrong/normalizr#normalizr----
+[react-hoc-loading]: https://github.com/MarcoScabbiolo/react-hoc-loading
 [webpack-dashboard]: https://github.com/FormidableLabs/webpack-dashboard#webpack-dashboard
