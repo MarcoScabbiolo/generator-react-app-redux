@@ -6,14 +6,20 @@ const assert = require('chai').assert;
 const types = require('babel-types');
 const astUtils = require('../astUtils');
 
-const shared = ['bootstrap', 'thunk', 'path', 'normalizr', 'form', 'reacthocloading'];
+const shared = [
+  'bootstrap',
+  'thunk',
+  'path',
+  'normalizr',
+  'form',
+  'reacthocloading',
+  'reactbootstraphocerror'
+];
 const prompts = [
   {
     name: 'name',
     message: 'What will be the name of the new entry?',
-    when: function() {
-      return !this.props.name;
-    }
+    when: props => !props.name
   }
 ];
 
@@ -58,6 +64,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
         name: this.props.name,
         path: this.props.path,
         reacthocloading: this.props.reacthocloading,
+        reactboostraphocerror: this.props.reactboostraphocerror,
         type: 'section',
         actions: this._relatedActions,
         logScaffoldingPath: false
@@ -69,6 +76,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
         path: this.props.name,
         bootstrap: this.props.bootstrap,
         reacthocloading: this.props.reacthocloading,
+        reactboostraphocerror: this.props.reactboostraphocerror,
         container: true,
         type: 'section',
         stylesheet: true,

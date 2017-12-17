@@ -11,16 +11,12 @@ const prompts = [
   {
     name: 'name',
     message: 'What will be the name of the new container?',
-    when: function() {
-      return !this.props.name;
-    }
+    when: props => !props.name
   },
   {
     name: 'component',
     message: 'The path to the component to contain',
-    when: function() {
-      return !this.props.component;
-    }
+    when: props => !props.component
   }
 ];
 

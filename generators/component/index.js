@@ -5,14 +5,12 @@ const types = require('babel-types');
 const astUtils = require('../astUtils');
 const environment = require('./Environment');
 
-const shared = ['path', 'bootstrap', 'reacthocloading'];
+const shared = ['path', 'bootstrap', 'reacthocloading', 'reactbootstraphocerror'];
 const prompts = [
   {
     name: 'name',
     message: 'What will be the name of the new component?',
-    when: function() {
-      return !this.props.name;
-    }
+    when: props => !props.name
   },
   {
     name: 'type',
@@ -33,27 +31,21 @@ const prompts = [
       }
     ],
     default: 'standard',
-    when: function() {
-      return !_.isString(this.props.type);
-    }
+    when: props => !_.isString(props.type)
   },
   {
     name: 'container',
     type: 'confirm',
     default: true,
     message: 'Do you want to include a container for this component?',
-    when: function() {
-      return !_.isBoolean(this.props.container);
-    }
+    when: props => !_.isBoolean(props.container)
   },
   {
     name: 'stylesheet',
     type: 'confirm',
     default: false,
     message: 'Do you want to include a stylesheet for this component?',
-    when: function() {
-      return !_.isBoolean(this.props.stylesheet);
-    }
+    when: props => !_.isBoolean(props.stylesheet)
   }
 ];
 
@@ -130,28 +122,33 @@ module.exports = class extends environment(ReactReduxGenerator) {
 
     let exportDefaultDeclaration = astUtils.findDefaultExportDeclaration(ast);
 
-    if (this.props.type === 'section' && this.props.reacthocloading) {
-      astUtils.newImport(
-        ast,
-        astUtils.singleSpecifierImportDeclaration('loading', 'react-hoc-loading', {
-          isDefault: true
-        })
-      );
+    if (this.props.type === 'section') {
+      if (this.props.reacthocloading) {
+        astUtils.newImport(
+          ast,
+          astUtils.singleSpecifierImportDeclaration('loading', 'react-hoc-loading', {
+            isDefault: true
+          })
+        );
 
-      let classDeclaration = astUtils.findClassDeclaration(ast, 'NewComponent');
-      if (!classDeclaration.decorators) {
-        classDeclaration.decorators = [];
+        let classDeclaration = astUtils.findClassDeclaration(ast, 'NewComponent');
+        if (!classDeclaration.decorators) {
+          classDeclaration.decorators = [];
+        }
+        classDeclaration.decorators.push(
+          types.decorator(types.callExpression(types.identifier('loading'), []))
+        );
+
+        let returnStmt = astUtils.findReturnStatement(
+          this._renderMethod(classDeclaration).body.body
+        );
+
+        if (types.isNullLiteral(returnStmt.argument)) {
+          returnStmt.argument = this._divElement([this._thisRenderLoading()]);
+        }
       }
-      classDeclaration.decorators.push(
-        types.decorator(types.callExpression(types.identifier('loading'), []))
-      );
-
-      let returnStmt = astUtils.findReturnStatement(
-        this._renderMethod(classDeclaration).body.body
-      );
-
-      if (types.isNullLiteral(returnStmt.argument)) {
-        returnStmt.argument = this._divElement([this._thisRenderLoading()]);
+      if (this.props.reactbootstraphocerror) {
+        throw new Error('Not implemented yet');
       }
     }
 

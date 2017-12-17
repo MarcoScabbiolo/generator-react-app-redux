@@ -5,14 +5,12 @@ const astUtils = require('../astUtils');
 const environment = require('./Environment');
 const types = require('babel-types');
 
-const shared = ['path', 'reacthocloading'];
+const shared = ['path', 'reacthocloading', 'reactbootstraphocerror'];
 const prompts = [
   {
     name: 'name',
     message: 'What will be the name of the new reducer?',
-    when: function() {
-      return !this.props.name;
-    }
+    when: props => !props.name
   },
   {
     name: 'type',
@@ -33,9 +31,7 @@ const prompts = [
       }
     ],
     default: 'simple',
-    when: function() {
-      return !this.props.type;
-    }
+    when: props => !props.type
   }
 ];
 
@@ -188,6 +184,10 @@ module.exports = class extends environment(ReactReduxGenerator) {
               })
             )
           );
+      }
+
+      if (this.props.reactbootstraphocerror) {
+        throw new Error('Not implemented yet');
       }
     }
 

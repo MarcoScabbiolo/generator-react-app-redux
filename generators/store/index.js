@@ -9,9 +9,7 @@ const prompts = [
   {
     name: 'name',
     message: 'What will be the name of the new store?',
-    when: function() {
-      return !this.props.name;
-    }
+    when: props => !props.name
   }
 ];
 

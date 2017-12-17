@@ -33,6 +33,11 @@ const options = {
     type: Boolean,
     required: false,
     desc: 'Use a HOC to set components to be loading with react-hoc-loading'
+  },
+  reactbootstraphocerror: {
+    type: Boolean,
+    required: false,
+    desc: 'Use a HOC to display errors in a component with react-boostrap-hoc-error'
   }
 };
 

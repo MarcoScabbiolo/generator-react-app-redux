@@ -22,6 +22,10 @@ module.exports = class extends reactReduxEnvironment(Generator) {
 
     this.reactReduxGeneratorOptions = reactReduxGeneratorOptions;
 
+    if (!this.reactReduxGeneratorOptions.prompts) {
+      this.reactReduxGeneratorOptions.prompts = [];
+    }
+
     sharedOptions.include(
       this.option.bind(this),
       reactReduxGeneratorOptions.shared,
@@ -50,25 +54,42 @@ module.exports = class extends reactReduxEnvironment(Generator) {
     }
   }
   _prompting() {
-    var that = this;
-
     this.log('');
     this.log(chalk.green(this.reactReduxGeneratorOptions.generatorName) + ' generator');
     this.log('');
 
-    _.forIn(this.reactReduxGeneratorOptions.prompts, prompt => {
-      prompt.when = prompt.when.bind(this);
-    });
+    let prompts = this.reactReduxGeneratorOptions.prompts
+      .concat(sharedPrompts.get(this.reactReduxGeneratorOptions.shared))
+      .map(p => {
+        p.order = p.order || 1;
+        return p;
+      });
 
-    return this.prompt(
-      this.reactReduxGeneratorOptions.prompts.concat(
-        sharedPrompts.get(this.props, this.reactReduxGeneratorOptions.shared)
+    prompts = new Map(
+      Array.from(new Set(prompts.map(p => p.order))).map(o => [
+        o,
+        prompts.filter(p => p.order === o)
+      ])
+    );
+
+    return Array.from(prompts.keys())
+      .sort()
+      .reduce(
+        (promise, order) =>
+          promise.then(lastPrompts => {
+            if (lastPrompts) {
+              this.props = extend(this.props, lastPrompts);
+            }
+
+            return this.prompt(sharedPrompts.bindToProps(prompts.get(order), this.props));
+          }),
+        Promise.resolve(undefined)
       )
-    ).then(props => {
-      that.props = extend(that.props, props);
-      if (_.isFunction(that.validating)) {
-        that.validating();
-      }
-    });
+      .then(last => {
+        this.props = extend(this.props, last);
+        if (_.isFunction(this.validating)) {
+          this.validating();
+        }
+      });
   }
 };

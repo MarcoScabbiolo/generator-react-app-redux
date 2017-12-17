@@ -8,9 +8,7 @@ const prompts = [
   {
     name: 'name',
     message: 'What will be the name of the action?',
-    when: function() {
-      return !this.props.name;
-    }
+    when: props => !props.name
   }
 ];
 

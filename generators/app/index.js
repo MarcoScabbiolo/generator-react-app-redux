@@ -1,73 +1,62 @@
 'use strict';
-const Generator = require('yeoman-generator');
+const ReactReduxGenerator = require('../ReactReduxGenerator');
 const chalk = require('chalk');
 const extend = require('deep-extend');
-const sharedOptions = require('../options');
-const sharedPrompts = require('../prompts');
 const astUtils = require('../astUtils');
 const types = require('babel-types');
-const _ = require('lodash');
 
-const shared = ['bootstrap', 'thunk', 'form', 'normalizr', 'reacthocloading'];
+const shared = [
+  'bootstrap',
+  'thunk',
+  'form',
+  'normalizr',
+  'reacthocloading',
+  'reactbootstraphocerror'
+];
 
-module.exports = class extends Generator {
+module.exports = class extends ReactReduxGenerator {
   constructor(args, options) {
-    super(args, options);
+    super(args, options, {
+      shared,
+      generatorName: 'React & Redux',
+      logScaffoldingPath: true
+    });
 
     this.option('webpackdashboard', {
       type: Boolean,
       required: false,
       desc: 'Use webpack-dashboard'
     });
-
-    sharedOptions.include(this.option.bind(this), shared, this.log.bind(this));
   }
   initializing() {
-    this.props = Object.assign({}, this.options);
-    this.log('Scaffolding in ' + chalk.yellow(this.destinationPath()));
+    return this._initializing();
   }
   prompting() {
-    this.log('');
-    this.log(chalk.green('React & Redux') + ' generator. Feel free to contribute!');
-    this.log('');
-
-    return this.prompt(
-      sharedPrompts.get(this.props, shared).concat([
-        {
-          message: 'Use webpack-dashboard?',
-          name: 'webpackdashboard',
-          type: 'confirm',
-          default: false,
-          store: true,
-          when: !_.isBoolean(this.options.webpackdashboard)
-        }
-      ])
-    ).then(props => {
-      this.props = extend(this.props, props);
+    return this._prompting().then(() => {
       this.config.set({
         bootstrapEnabled: this.props.bootstrap,
         thunkEnabled: this.props.thunk,
         formsEnabled: this.props.form
       });
       this.config.save();
-    });
-  }
-  default() {
-    this.composeWith(require.resolve('generator-node/generators/app'), {
-      boilerplate: false,
-      skipInstall: this.options.skipInstall,
-      license: this.options.license
-    });
-    this.composeWith(require.resolve('../entry'), {
-      name: 'main',
-      bootstrap: this.props.bootstrap,
-      thunk: this.props.thunk,
-      normalizr: this.props.normalizr,
-      form: this.props.form,
-      reacthocloading: this.props.reacthocloading,
-      path: '',
-      skipEntryDirectory: true,
-      logScaffoldingPath: false
+
+      this.composeWith(require.resolve('generator-node/generators/app'), {
+        boilerplate: false,
+        skipInstall: this.options.skipInstall,
+        license: this.options.license
+      });
+      this.composeWith(require.resolve('../entry'), {
+        name: 'main',
+        bootstrap: this.props.bootstrap,
+        thunk: this.props.thunk,
+        normalizr: this.props.normalizr,
+        form: this.props.form,
+        reacthocloading: this.props.reacthocloading,
+        reactbootstraphocerror: this.props.reactbootstraphocerror,
+        path: '',
+        skipEntryDirectory: true,
+        logScaffoldingPath: false
+      });
     });
   }
   _extendJSON(target, source, write = true) {
@@ -133,13 +122,16 @@ module.exports = class extends Generator {
       pkg.dependencies.normalizr = '^3.2.4';
     }
     if (this.props.reacthocloading) {
-      pkg.dependencies['react-hoc-loading'] = '^1.0.2';
+      pkg.dependencies['react-hoc-loading'] = '^1.0.7';
 
       this.log(
         `Dont forget to set your ${chalk.yellow(
           'default LoadingComponent'
         )}: https://github.com/MarcoScabbiolo/react-hoc-loading#set-a-default-loadingcomponent-globally-with-setdefaultloadingcomponent`
       );
+    }
+    if (this.props.reactbootstraphocerror) {
+      pkg.dependencies['react-bootstrap-hoc-error'] = '^0.0.1';
     }
 
     pkg.eslintConfig = {
