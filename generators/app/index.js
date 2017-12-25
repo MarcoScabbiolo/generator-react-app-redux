@@ -144,6 +144,7 @@ module.exports = class extends Generator {
 
     pkg.eslintConfig = {
       parser: 'babel-eslint',
+      extends: ['plugin:react/recommended'],
       env: {
         browser: true
       }
