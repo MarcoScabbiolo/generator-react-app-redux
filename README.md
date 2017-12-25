@@ -1,6 +1,6 @@
 # generator-react-app-redux 
 ![Build Status][travis] [![Coverage Status][coveralls-badge]][coveralls-status]
-[![Maintainability][codeclimate-badge]][codeclimate-status] ![Dependencies Status][davis]
+[![Maintainability][codeclimate-badge]][codeclimate-status] [![Dependencies Status][davis-badge]][davis]
 
 React &amp; Redux generator, no server side.
 
@@ -51,7 +51,8 @@ If there's something you don't like about the generated proyect [please share yo
 [coveralls-badge]: https://coveralls.io/repos/github/MarcoScabbiolo/generator-react-app-redux/badge.svg?branch=master "Coveralls coverage status"
 [codeclimate-status]: https://codeclimate.com/github/MarcoScabbiolo/generator-react-app-redux/maintainability
 [codeclimate-badge]: https://api.codeclimate.com/v1/badges/52b628e0764aad1dff9d/maintainability "Code Climate Maintainability"
-[davis]: https://david-dm.org/MarcoScabbiolo/generator-react-app-redux.svg
+[davis]: https://david-dm.org/MarcoScabbiolo/generator-react-app-redux
+[davis-badge]: https://david-dm.org/MarcoScabbiolo/generator-react-app-redux.svg
 [react]: https://reactjs.org/
 [redux]: https://redux.js.org/
 [webpack]: https://webpack.js.org/
