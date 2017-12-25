@@ -40,6 +40,7 @@ describe('generator-react-app-redux:app', () => {
         form: true,
         thunk: true,
         normalizr: true,
+        thunk: true,
         webpackdashboard: true,
         reacthocloading: true
       })
