@@ -38,6 +38,7 @@ describe('generator-react-app-redux:app', () => {
       .withPrompts({
         bootstrap: true,
         form: true,
+        thunk: true,
         normalizr: true,
         webpackdashboard: true,
         reacthocloading: true

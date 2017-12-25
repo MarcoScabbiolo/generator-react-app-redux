@@ -123,6 +123,21 @@ module.exports = class extends environment(ReactReduxGenerator) {
       alternate
     );
   }
+  get _loadingTrue() {
+    return types.objectProperty(types.identifier('loading'), types.booleanLiteral(true));
+  }
+  get _loadingFalse() {
+    return types.objectProperty(types.identifier('loading'), types.booleanLiteral(false));
+  }
+  get _errorUndefined() {
+    return types.objectProperty(types.identifier('error'), types.identifier('undefined'));
+  }
+  get _actionError() {
+    return types.objectProperty(
+      types.identifier('error'),
+      types.memberExpression(types.identifier('action'), types.identifier('error'))
+    );
+  }
   writing() {
     let ast = astUtils.parse(this._templateByTypeContents);
 
@@ -148,46 +163,83 @@ module.exports = class extends environment(ReactReduxGenerator) {
     if (this.props.type === 'section') {
       this._addSection();
 
-      if (this.props.reacthocloading) {
+      if (this.props.reacthocloading || this.props.reactbootstraphocerror) {
+        let loadingProperties;
+        let notLoadingProperties;
+        let errorProperties;
+        let reducingOperations;
+
+        // Add action arrays
         ast.program.body.unshift(
           this._emptyActionsArrayConstDeclaration('loadingActions'),
           this._emptyActionsArrayConstDeclaration('notLoadingActions')
         );
 
-        astUtils
-          .findSingleVariableDeclaration(ast, 'const', 'initialState')
-          .declarations[0].init.properties.push(
-            types.objectProperty(types.identifier('loading'), types.booleanLiteral(false))
+        if (this.props.reactbootstraphocerror) {
+          ast.program.body.unshift(
+            this._emptyActionsArrayConstDeclaration('errorActions')
           );
+        }
+
+        // Add properties in the initialState
+        if (this.props.reacthocloading) {
+          astUtils
+            .findSingleVariableDeclaration(ast, 'const', 'initialState')
+            .declarations[0].init.properties.push(this._loadingFalse);
+        }
+        if (this.props.reactbootstraphocerror) {
+          astUtils
+            .findSingleVariableDeclaration(ast, 'const', 'initialState')
+            .declarations[0].init.properties.push(this._errorUndefined);
+        }
+
+        // Changes to the state
+        if (this.props.reacthocloading) {
+          loadingProperties = [this._loadingTrue];
+          notLoadingProperties = [this._loadingFalse];
+
+          if (this.props.reactbootstraphocerror) {
+            loadingProperties.push(this._errorUndefined);
+            notLoadingProperties.push(this._errorUndefined);
+          }
+        }
+        if (this.props.reactbootstraphocerror) {
+          errorProperties = [this._actionError];
+          if (this.props.reacthocloading) {
+            errorProperties.push(this._loadingFalse);
+          }
+        }
+
+        // Initial reducing of error and loading
+        if ((!loadingProperties || !notLoadingProperties) && errorProperties) {
+          reducingOperations = this._ifIncludesReplaceBaseStateBlock({
+            arrayIdentifier: 'errorActions',
+            properties: errorProperties
+          });
+        } else {
+          reducingOperations = this._ifIncludesReplaceBaseStateBlock(
+            {
+              arrayIdentifier: 'loadingActions',
+              properties: loadingProperties
+            },
+            this._ifIncludesReplaceBaseStateBlock(
+              {
+                arrayIdentifier: 'notLoadingActions',
+                properties: notLoadingProperties
+              },
+              errorProperties
+                ? this._ifIncludesReplaceBaseStateBlock({
+                    arrayIdentifier: 'errorActions',
+                    properties: errorProperties
+                  })
+                : undefined
+            )
+          );
+        }
 
         astUtils
           .findSingleVariableDeclaration(ast, 'const', 'reducer')
-          .declarations[0].init.body.body.unshift(
-            this._ifIncludesReplaceBaseStateBlock(
-              {
-                arrayIdentifier: 'loadingActions',
-                properties: [
-                  types.objectProperty(
-                    types.identifier('loading'),
-                    types.booleanLiteral(true)
-                  )
-                ]
-              },
-              this._ifIncludesReplaceBaseStateBlock({
-                arrayIdentifier: 'notLoadingActions',
-                properties: [
-                  types.objectProperty(
-                    types.identifier('loading'),
-                    types.booleanLiteral(false)
-                  )
-                ]
-              })
-            )
-          );
-      }
-
-      if (this.props.reactbootstraphocerror) {
-        throw new Error('Not implemented yet');
+          .declarations[0].init.body.body.unshift(reducingOperations);
       }
     }
 

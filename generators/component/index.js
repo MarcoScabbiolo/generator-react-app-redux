@@ -92,10 +92,10 @@ module.exports = class extends environment(ReactReduxGenerator) {
       children
     );
   }
-  _thisRenderLoading(args = []) {
+  _thisRender(identifier, args = []) {
     return types.jSXExpressionContainer(
       types.callExpression(
-        types.memberExpression(types.thisExpression(), types.identifier('renderLoading')),
+        types.memberExpression(types.thisExpression(), types.identifier(identifier)),
         args
       )
     );
@@ -123,32 +123,55 @@ module.exports = class extends environment(ReactReduxGenerator) {
     let exportDefaultDeclaration = astUtils.findDefaultExportDeclaration(ast);
 
     if (this.props.type === 'section') {
-      if (this.props.reacthocloading) {
-        astUtils.newImport(
-          ast,
-          astUtils.singleSpecifierImportDeclaration('loading', 'react-hoc-loading', {
-            isDefault: true
-          })
-        );
-
+      if (this.props.reacthocloading || this.props.reactbootstraphocerror) {
         let classDeclaration = astUtils.findClassDeclaration(ast, 'NewComponent');
         if (!classDeclaration.decorators) {
           classDeclaration.decorators = [];
         }
-        classDeclaration.decorators.push(
-          types.decorator(types.callExpression(types.identifier('loading'), []))
-        );
+
+        if (this.props.reacthocloading) {
+          astUtils.newImport(
+            ast,
+            astUtils.singleSpecifierImportDeclaration('loading', 'react-hoc-loading', {
+              isDefault: true
+            })
+          );
+
+          classDeclaration.decorators.push(
+            types.decorator(types.callExpression(types.identifier('loading'), []))
+          );
+        }
+        if (this.props.reactbootstraphocerror) {
+          astUtils.newImport(
+            ast,
+            astUtils.singleSpecifierImportDeclaration(
+              'errorable',
+              'react-bootstrap-hoc-error',
+              {
+                isDefault: true
+              }
+            )
+          );
+
+          classDeclaration.decorators.push(
+            types.decorator(types.callExpression(types.identifier('errorable'), []))
+          );
+        }
 
         let returnStmt = astUtils.findReturnStatement(
           this._renderMethod(classDeclaration).body.body
         );
 
         if (types.isNullLiteral(returnStmt.argument)) {
-          returnStmt.argument = this._divElement([this._thisRenderLoading()]);
+          let toRender = [];
+          if (this.props.reacthocloading) {
+            toRender.push(this._thisRender('renderLoading'));
+          }
+          if (this.props.reactbootstraphocerror) {
+            toRender.push(this._thisRender('renderError'));
+          }
+          returnStmt.argument = this._divElement(toRender);
         }
-      }
-      if (this.props.reactbootstraphocerror) {
-        throw new Error('Not implemented yet');
       }
     }
 

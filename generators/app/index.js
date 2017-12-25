@@ -4,6 +4,7 @@ const chalk = require('chalk');
 const extend = require('deep-extend');
 const astUtils = require('../astUtils');
 const types = require('babel-types');
+const _ = require('lodash');
 
 const shared = [
   'bootstrap',
@@ -19,7 +20,17 @@ module.exports = class extends ReactReduxGenerator {
     super(args, options, {
       shared,
       generatorName: 'React & Redux',
-      logScaffoldingPath: true
+      logScaffoldingPath: true,
+      prompts: [
+        {
+          name: 'webpackdashboard',
+          message: 'Use webpack-dashboard?',
+          type: 'confirm',
+          default: false,
+          store: true,
+          when: props => !_.isBoolean(props.webpackdashboard)
+        }
+      ]
     });
 
     this.option('webpackdashboard', {
