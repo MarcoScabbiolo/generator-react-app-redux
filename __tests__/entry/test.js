@@ -39,7 +39,11 @@ function testSuite(
       skipEntryDirectory: false,
       path: 'generator_tests',
       name: 'test',
-      reacthocloading: false
+      sections: false,
+      entities: false,
+      reacthocloading: false,
+      reactbootstraperror: false,
+      reduxloaderror: false
     }
   },
   testEnvironment = false
@@ -120,20 +124,25 @@ function testSuite(
         thunk: generator.props.thunk,
         name: generator.props.name,
         path: generator.props.path,
+        sections: generator.props.sections,
+        entities: generator.props.entities,
         normalizr: generator.props.normalizr
       }
     });
 
-    reducer({
-      runGenerator: false,
-      options: {
-        name: generator.props.name,
-        path: generator.props.path,
-        type: 'section',
-        actions: generator._relatedActions,
-        reacthocloading: generator.props.reacthocloading
-      }
-    });
+    if (generator.props.sections) {
+      reducer({
+        runGenerator: false,
+        options: {
+          name: generator.props.name,
+          path: generator.props.path,
+          type: 'section',
+          actions: generator._relatedActions,
+          reactloaderror: generator.props.reactloaderror
+        },
+        prompts: {}
+      });
+    }
 
     component({
       runGenerator: false,
@@ -141,9 +150,10 @@ function testSuite(
         bootstrap: generator.props.bootstrap,
         name: 'index',
         path: generator.props.name,
-        type: 'section',
+        type: generator.props.sections ? 'section' : 'simple',
         stylesheet: true,
         reacthocloading: generator.props.reacthocloading,
+        reactbootstraperror: generator.props.reactbootstraperror,
         componentname: generator.props.name
       }
     });

@@ -7,8 +7,7 @@ const prompts = [
     type: 'confirm',
     default: false,
     store: true,
-    when: props => !_.isBoolean(props.bootstrap),
-    order: 1
+    when: props => !_.isBoolean(props.bootstrap)
   },
   {
     name: 'thunk',
@@ -32,21 +31,14 @@ const prompts = [
     when: props => !_.isBoolean(props.form)
   },
   {
-    name: 'normalizr',
-    message: 'Use normalizr?',
-    type: 'confirm',
-    default: false,
-    store: true,
-    when: props => !_.isBoolean(props.normalizr)
-  },
-  {
     message: 'Use a HOC for components that can be loading?',
     name: 'reacthocloading',
     type: 'confirm',
     default: false,
     store: true,
     when: props =>
-      !_.isBoolean(props.reacthocloading) && (!props.type || props.type === 'section')
+      !_.isBoolean(props.reacthocloading) && (!props.type || props.type === 'section'),
+    order: 3
   },
   {
     message: 'Use a HOC for components that can have an error?',
@@ -58,7 +50,27 @@ const prompts = [
       !_.isBoolean(props.reactbootstraphocerror) &&
       _.isBoolean(props.bootstrap) &&
       props.bootstrap,
-    order: 2
+    order: 3
+  },
+  {
+    message:
+      'Use a pre-reducer for mayor UI components to set them to set them to be loading or display an error?',
+    name: 'reduxloaderror',
+    type: 'confirm',
+    default: false,
+    sotre: true,
+    when: props =>
+      !_.isBoolean(props.reduxloaderror) && _.isBoolean(props.sections) && props.sections,
+    order: 4
+  },
+  {
+    name: 'normalizr',
+    message: 'Use normalizr?',
+    type: 'confirm',
+    default: false,
+    store: true,
+    when: props => !_.isBoolean(props.normalizr) && props.entities,
+    order: 6
   }
 ];
 

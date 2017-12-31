@@ -20,7 +20,7 @@ function testSuite(
       path: 'generator_tests'
     },
     options: {
-      reacthocloading: false,
+      reduxloaderror: false,
       actions: {
         app: 'actions/app',
         other: 'actions/other'
@@ -98,19 +98,27 @@ function testSuite(
           `import ${generator.props.name} from '${generator._reducerToCreatePath}';`
         );
       });
+    }
 
-      if (generator.props.reacthocloading) {
-        test('adds the actions arrays', () => {
-          assert.fileContent(
-            generator._reducerToCreateFilePath,
-            `const loadingActions = [];`
-          );
-          assert.fileContent(
-            generator._reducerToCreateFilePath,
-            `const notLoadingActions = [];`
-          );
-        });
-      }
+    if (generator.props.reduxloaderror) {
+      test('adds the actions arrays and composes the reducer with the pre-reducer', () => {
+        assert.fileContent(
+          generator._reducerToCreateFilePath,
+          `const loadingActions = [];`
+        );
+        assert.fileContent(
+          generator._reducerToCreateFilePath,
+          `const notLoadingActions = [];`
+        );
+        assert.fileContent(
+          generator._reducerToCreateFilePath,
+          `const errorActions = [];`
+        );
+        assert.fileContent(
+          generator._reducerToCreateFilePath,
+          `export default loadErrorPreReducer(reducer, loadingActions, notLoadingActions, errorActions);`
+        );
+      });
     }
   });
 }

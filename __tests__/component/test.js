@@ -1,4 +1,3 @@
-'use strict';
 const path = require('path');
 const assert = require('yeoman-assert');
 const helpers = require('yeoman-test');
@@ -23,7 +22,8 @@ function testSuite(
       stylesheet: false
     },
     options: {
-      reacthocloading: false
+      reacthocloading: false,
+      reactbootstraperror: false
     }
   },
   testEnvironment = false
@@ -106,6 +106,22 @@ function testSuite(
       prop: generator.props.reacthocloading,
       file: generator._componentToCreateFilePath,
       content: `@loading()`
+    });
+
+    testUtils.testFileContentsByProp({
+      testTrue: 'imports react-bootstrap-hoc-error',
+      testFalse: 'does not import react-bootstrap-hoc-error',
+      prop: generator.props.reactbootstraperror,
+      file: generator._componentToCreateFilePath,
+      content: `import errorable from 'react-bootstrap-hoc-error';`
+    });
+
+    testUtils.testFileContentsByProp({
+      testTrue: 'adds the errorable decorator',
+      testFalse: 'does not add the errorable decorator',
+      prop: generator.props.reactbootstraperror,
+      file: generator._componentToCreateFilePath,
+      content: `@errorable()`
     });
   });
 

@@ -38,6 +38,23 @@ const options = {
     type: Boolean,
     required: false,
     desc: 'Use a HOC to display errors in a component with react-boostrap-hoc-error'
+  },
+  sections: {
+    type: Boolean,
+    required: false,
+    default: false,
+    desc: 'Create a sections reducer'
+  },
+  entities: {
+    type: Boolean,
+    required: false,
+    default: false,
+    desc: 'Create an entities reducer'
+  },
+  reduxloaderror: {
+    type: Boolean,
+    required: false,
+    desc: 'Use a pre-reducer for the loading and errors of mayor UI components?'
   }
 };
 

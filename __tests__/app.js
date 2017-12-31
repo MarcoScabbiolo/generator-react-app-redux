@@ -40,9 +40,12 @@ describe('generator-react-app-redux:app', () => {
         form: true,
         thunk: true,
         normalizr: true,
-        thunk: true,
         webpackdashboard: true,
-        reacthocloading: true
+        sections: true,
+        entities: true,
+        reacthocloading: true,
+        reactbootstraphocerror: true,
+        reduxloaderror: true
       })
       .withGenerators(dummyDependencies));
 
@@ -80,6 +83,9 @@ describe('generator-react-app-redux:app', () => {
         expect(pkg.dependencies).to.include.all.keys(
           'redux-thunk',
           'react-bootstrap',
+          'react-hoc-loading',
+          'react-bootstrap-hoc-error',
+          'redux-load-error',
           'redux-form',
           'normalizr'
         );
@@ -103,7 +109,11 @@ describe('generator-react-app-redux:app', () => {
       thunk: true,
       path: '',
       skipEntryDirectory: true,
-      reacthocloading: true
+      sections: true,
+      entities: true,
+      reacthocloading: true,
+      reactbootstraperror: true,
+      reduxloaderror: true
     },
     prompts: {}
   });
@@ -120,7 +130,11 @@ describe('generator-react-app-redux:app:2', () => {
         normalizr: false,
         thunk: false,
         dashboard: false,
-        reacthocloading: false
+        sections: false,
+        entities: false,
+        reacthocloading: false,
+        reactbootstraphocerror: false,
+        reduxloaderror: false
       })
       .withGenerators(dummyDependencies)
       .inTmpDir(dir => {
@@ -145,6 +159,9 @@ describe('generator-react-app-redux:app:2', () => {
         expect(pkg.dependencies).not.to.include.any.keys(
           'redux-thunk',
           'react-bootstrap',
+          'react-hoc-loading',
+          'react-bootstrap-hoc-error',
+          'redux-load-error',
           'redux-form',
           'normalizr'
         );
@@ -167,7 +184,11 @@ describe('generator-react-app-redux:app:2', () => {
       thunk: false,
       path: '',
       skipEntryDirectory: true,
-      reacthocloading: false
+      reacthocloading: false,
+      reactbootstraperror: false,
+      reduxloaderror: false,
+      sections: false,
+      entities: false
     },
     prompts: {}
   });

@@ -5,6 +5,7 @@ const chalk = require('chalk');
 const assert = require('chai').assert;
 const types = require('babel-types');
 const astUtils = require('../astUtils');
+const sharedOptions = require('../options');
 
 const shared = [
   'bootstrap',
@@ -13,7 +14,8 @@ const shared = [
   'normalizr',
   'form',
   'reacthocloading',
-  'reactbootstraphocerror'
+  'reactbootstraphocerror',
+  'reduxloaderror'
 ];
 const prompts = [
   {
@@ -38,6 +40,12 @@ module.exports = class extends environment(ReactReduxGenerator) {
       default: false,
       desc: 'Do not create a directory for the entry and template files'
     });
+
+    sharedOptions.include(
+      this.option.bind(this),
+      ['sections', 'entities'],
+      this.log.bind(this)
+    );
   }
 
   initializing() {
@@ -57,30 +65,35 @@ module.exports = class extends environment(ReactReduxGenerator) {
         normalizr: this.props.normalizr,
         form: this.props.form,
         path: this.props.path,
-        logScaffoldingPath: false
+        logScaffoldingPath: false,
+        sections: this.props.sections,
+        entities: this.props.entities
       });
 
-      this.composeWith(require.resolve('../reducer'), {
-        name: this.props.name,
-        path: this.props.path,
-        reacthocloading: this.props.reacthocloading,
-        reactboostraphocerror: this.props.reactboostraphocerror,
-        type: 'section',
-        actions: this._relatedActions,
-        logScaffoldingPath: false
-      });
+      if (this.props.sections) {
+        this.composeWith(require.resolve('../reducer'), {
+          name: this.props.name,
+          path: this.props.path,
+          reacthocloading: this.props.reacthocloading,
+          reactboostraphocerror: this.props.reactboostraphocerror,
+          type: 'section',
+          reduxloaderror: this.props.reduxloaderror,
+          actions: this._relatedActions,
+          logScaffoldingPath: false
+        });
+      }
 
       this.composeWith(require.resolve('../component'), {
         name: 'index',
         componentname: this.props.name,
         path: this.props.name,
         bootstrap: this.props.bootstrap,
-        reacthocloading: this.props.reacthocloading,
-        reactboostraphocerror: this.props.reactboostraphocerror,
         container: true,
-        type: 'section',
         stylesheet: true,
-        logScaffoldingPath: false
+        logScaffoldingPath: false,
+        reacthocloading: this.props.sections && this.props.reacthocloading,
+        reactboostraphocerror: this.props.sections && this.props.reactboostraphocerror,
+        type: this.props.sections ? 'section' : 'standard'
       });
     });
   }

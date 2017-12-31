@@ -5,7 +5,7 @@ const astUtils = require('../astUtils');
 const environment = require('./Environment');
 const types = require('babel-types');
 
-const shared = ['path', 'reacthocloading', 'reactbootstraphocerror'];
+const shared = ['path', 'reduxloaderror'];
 const prompts = [
   {
     name: 'name',
@@ -99,45 +99,6 @@ module.exports = class extends environment(ReactReduxGenerator) {
       types.variableDeclarator(types.identifier(identifier), types.arrayExpression([]))
     ]);
   }
-  _ifIncludesReplaceBaseStateBlock(declaration, alternate = undefined) {
-    return types.ifStatement(
-      types.callExpression(
-        types.memberExpression(
-          types.identifier(declaration.arrayIdentifier),
-          types.identifier('includes')
-        ),
-        [types.memberExpression(types.identifier('action'), types.identifier('type'))]
-      ),
-      types.blockStatement([
-        types.expressionStatement(
-          types.assignmentExpression(
-            '=',
-            types.identifier('state'),
-            types.objectExpression([
-              types.spreadProperty(types.identifier('state')),
-              ...declaration.properties
-            ])
-          )
-        )
-      ]),
-      alternate
-    );
-  }
-  get _loadingTrue() {
-    return types.objectProperty(types.identifier('loading'), types.booleanLiteral(true));
-  }
-  get _loadingFalse() {
-    return types.objectProperty(types.identifier('loading'), types.booleanLiteral(false));
-  }
-  get _errorUndefined() {
-    return types.objectProperty(types.identifier('error'), types.identifier('undefined'));
-  }
-  get _actionError() {
-    return types.objectProperty(
-      types.identifier('error'),
-      types.memberExpression(types.identifier('action'), types.identifier('error'))
-    );
-  }
   writing() {
     let ast = astUtils.parse(this._templateByTypeContents);
 
@@ -163,83 +124,43 @@ module.exports = class extends environment(ReactReduxGenerator) {
     if (this.props.type === 'section') {
       this._addSection();
 
-      if (this.props.reacthocloading || this.props.reactbootstraphocerror) {
-        let loadingProperties;
-        let notLoadingProperties;
-        let errorProperties;
-        let reducingOperations;
+      if (this.props.reduxloaderror) {
+        // Import redux-load-error as loadErrorPreReducer
+        astUtils.newImport(
+          ast,
+          astUtils.singleSpecifierImportDeclaration(
+            'loadErrorPreReducer',
+            'redux-load-error',
+            { isDefault: true }
+          )
+        );
 
         // Add action arrays
         ast.program.body.unshift(
           this._emptyActionsArrayConstDeclaration('loadingActions'),
-          this._emptyActionsArrayConstDeclaration('notLoadingActions')
+          this._emptyActionsArrayConstDeclaration('notLoadingActions'),
+          this._emptyActionsArrayConstDeclaration('errorActions')
         );
 
-        if (this.props.reactbootstraphocerror) {
-          ast.program.body.unshift(
-            this._emptyActionsArrayConstDeclaration('errorActions')
-          );
-        }
-
-        // Add properties in the initialState
-        if (this.props.reacthocloading) {
-          astUtils
-            .findSingleVariableDeclaration(ast, 'const', 'initialState')
-            .declarations[0].init.properties.push(this._loadingFalse);
-        }
-        if (this.props.reactbootstraphocerror) {
-          astUtils
-            .findSingleVariableDeclaration(ast, 'const', 'initialState')
-            .declarations[0].init.properties.push(this._errorUndefined);
-        }
-
-        // Changes to the state
-        if (this.props.reacthocloading) {
-          loadingProperties = [this._loadingTrue];
-          notLoadingProperties = [this._loadingFalse];
-
-          if (this.props.reactbootstraphocerror) {
-            loadingProperties.push(this._errorUndefined);
-            notLoadingProperties.push(this._errorUndefined);
-          }
-        }
-        if (this.props.reactbootstraphocerror) {
-          errorProperties = [this._actionError];
-          if (this.props.reacthocloading) {
-            errorProperties.push(this._loadingFalse);
-          }
-        }
-
-        // Initial reducing of error and loading
-        if ((!loadingProperties || !notLoadingProperties) && errorProperties) {
-          reducingOperations = this._ifIncludesReplaceBaseStateBlock({
-            arrayIdentifier: 'errorActions',
-            properties: errorProperties
-          });
-        } else {
-          reducingOperations = this._ifIncludesReplaceBaseStateBlock(
-            {
-              arrayIdentifier: 'loadingActions',
-              properties: loadingProperties
-            },
-            this._ifIncludesReplaceBaseStateBlock(
-              {
-                arrayIdentifier: 'notLoadingActions',
-                properties: notLoadingProperties
-              },
-              errorProperties
-                ? this._ifIncludesReplaceBaseStateBlock({
-                    arrayIdentifier: 'errorActions',
-                    properties: errorProperties
-                  })
-                : undefined
-            )
-          );
-        }
-
+        // Add loading: false in the initialState
         astUtils
-          .findSingleVariableDeclaration(ast, 'const', 'reducer')
-          .declarations[0].init.body.body.unshift(reducingOperations);
+          .findSingleVariableDeclaration(ast, 'const', 'initialState')
+          .declarations[0].init.properties.push(
+            types.objectProperty(types.identifier('loading'), types.booleanLiteral(false))
+          );
+
+        // Compose the reducer
+        let exportDeclaration = astUtils.findDefaultExportDeclaration(ast);
+
+        exportDeclaration.declaration = types.callExpression(
+          types.identifier('loadErrorPreReducer'),
+          [
+            types.identifier('reducer'),
+            types.identifier('loadingActions'),
+            types.identifier('notLoadingActions'),
+            types.identifier('errorActions')
+          ]
+        );
       }
     }
 

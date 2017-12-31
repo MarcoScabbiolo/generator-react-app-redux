@@ -3,6 +3,7 @@ const ReactReduxGenerator = require('../ReactReduxGenerator');
 const types = require('babel-types');
 const assert = require('chai').assert;
 const astUtils = require('../astUtils');
+const sharedOptions = require('../options');
 
 const shared = ['thunk', 'path', 'form', 'normalizr'];
 const prompts = [
@@ -26,12 +27,28 @@ module.exports = class extends ReactReduxGenerator {
       required: false,
       desc: 'The name of the store'
     });
+
+    sharedOptions.include(
+      this.option.bind(this),
+      ['sections', 'entities'],
+      this.log.bind(this)
+    );
   }
   initializing() {
     return this._initializing();
   }
   prompting() {
-    return this._prompting();
+    return this._prompting().then(() => {
+      if (!this.props.sections && !this.props.entities) {
+        this.composeWith(require.resolve('../reducer'), {
+          name: 'main',
+          path: this._resolvedPath,
+          type: 'simple',
+          actions: this._relatedActions,
+          logScaffoldingPath: false
+        });
+      }
+    });
   }
   _writeEntitiesReducer() {
     let ast = astUtils.parse(this.fs.read(this.templatePath('entities.js')));
@@ -76,23 +93,37 @@ module.exports = class extends ReactReduxGenerator {
       toCombine.push(astUtils.shorthandProperty('form'));
     }
 
-    // Import sections reducer
-    ast = astUtils.newImport(
-      ast,
-      astUtils.singleSpecifierImportDeclaration('sections', this._sectionsReducerPath, {
-        isDefault: true
-      })
-    );
-    toCombine.push(astUtils.shorthandProperty('sections'));
+    if (this.props.sections) {
+      // Import sections reducer
+      ast = astUtils.newImport(
+        ast,
+        astUtils.singleSpecifierImportDeclaration('sections', this._sectionsReducerPath, {
+          isDefault: true
+        })
+      );
+      toCombine.push(astUtils.shorthandProperty('sections'));
+    }
 
-    // Import entities reducer
-    ast = astUtils.newImport(
-      ast,
-      astUtils.singleSpecifierImportDeclaration('entities', this._entitiesReducerPath, {
-        isDefault: true
-      })
-    );
-    toCombine.push(astUtils.shorthandProperty('entities'));
+    if (this.props.entities) {
+      // Import entities reducer
+      ast = astUtils.newImport(
+        ast,
+        astUtils.singleSpecifierImportDeclaration('entities', this._entitiesReducerPath, {
+          isDefault: true
+        })
+      );
+      toCombine.push(astUtils.shorthandProperty('entities'));
+    }
+
+    if (!this.props.sections && !this.props.entities) {
+      ast = astUtils.newImport(
+        ast,
+        astUtils.singleSpecifierImportDeclaration('main', this._reducerPath('main'), {
+          isDefault: true
+        })
+      );
+      toCombine.push(astUtils.shorthandProperty('main'));
+    }
 
     // Write the root reducer file
     this.fs.write(
@@ -149,13 +180,17 @@ module.exports = class extends ReactReduxGenerator {
     this.fs.write(this.destinationPath(this._storeFilePath), astUtils.generate(ast));
   }
   writing() {
-    // Copy sections reducer
-    this.fs.copy(
-      this.templatePath('static/sections.js'),
-      this.destinationPath(this._sectionsReducerFilePath)
-    );
+    if (this.props.sections) {
+      // Copy sections reducer
+      this.fs.copy(
+        this.templatePath('static/sections.js'),
+        this.destinationPath(this._sectionsReducerFilePath)
+      );
+    }
 
-    this._writeEntitiesReducer();
+    if (this.props.entities) {
+      this._writeEntitiesReducer();
+    }
     this._writeRootReducer();
     this._writeStore();
   }

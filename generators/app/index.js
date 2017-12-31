@@ -12,7 +12,8 @@ const shared = [
   'form',
   'normalizr',
   'reacthocloading',
-  'reactbootstraphocerror'
+  'reactbootstraphocerror',
+  'reduxloaderror'
 ];
 
 module.exports = class extends ReactReduxGenerator {
@@ -29,6 +30,24 @@ module.exports = class extends ReactReduxGenerator {
           default: false,
           store: true,
           when: props => !_.isBoolean(props.webpackdashboard)
+        },
+        {
+          name: 'sections',
+          message: 'Do you want to have dedicated reducers for every mayor UI component?',
+          type: 'confirm',
+          default: true,
+          store: false,
+          when: props => !_.isBoolean(props.sections),
+          order: 2
+        },
+        {
+          name: 'entities',
+          message: 'Do you want to decouple your entities from the UI?',
+          type: 'confirm',
+          default: true,
+          store: false,
+          when: props => !_.isBoolean(props.entities),
+          order: 5
         }
       ]
     });
@@ -65,6 +84,8 @@ module.exports = class extends ReactReduxGenerator {
         reacthocloading: this.props.reacthocloading,
         reactbootstraphocerror: this.props.reactbootstraphocerror,
         path: '',
+        sections: this.props.sections,
+        entities: this.props.entities,
         skipEntryDirectory: true,
         logScaffoldingPath: false
       });
@@ -143,6 +164,9 @@ module.exports = class extends ReactReduxGenerator {
     }
     if (this.props.reactbootstraphocerror) {
       pkg.dependencies['react-bootstrap-hoc-error'] = '^0.0.1';
+    }
+    if (this.props.reduxloaderror) {
+      pkg.dependencies['redux-load-error'] = '^1.0.2';
     }
 
     pkg.eslintConfig = {
