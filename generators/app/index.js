@@ -158,7 +158,7 @@ module.exports = class extends ReactReduxGenerator {
       pkg.dependencies['react-hoc-loading'] = '^1.0.7';
     }
     if (this.props.reactbootstraphocerror) {
-      pkg.dependencies['react-bootstrap-hoc-error'] = '^0.1.1';
+      pkg.dependencies['react-bootstrap-hoc-error'] = '^0.1.3';
     }
     if (this.props.reduxloaderror) {
       pkg.dependencies['redux-load-error'] = '^1.0.2';
