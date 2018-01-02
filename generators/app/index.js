@@ -83,6 +83,7 @@ module.exports = class extends ReactReduxGenerator {
         form: this.props.form,
         reacthocloading: this.props.reacthocloading,
         reactbootstraphocerror: this.props.reactbootstraphocerror,
+        reduxloaderror: this.props.reduxloaderror,
         path: '',
         sections: this.props.sections,
         entities: this.props.entities,
@@ -155,15 +156,9 @@ module.exports = class extends ReactReduxGenerator {
     }
     if (this.props.reacthocloading) {
       pkg.dependencies['react-hoc-loading'] = '^1.0.7';
-
-      this.log(
-        `Dont forget to set your ${chalk.yellow(
-          'default LoadingComponent'
-        )}: https://github.com/MarcoScabbiolo/react-hoc-loading#set-a-default-loadingcomponent-globally-with-setdefaultloadingcomponent`
-      );
     }
     if (this.props.reactbootstraphocerror) {
-      pkg.dependencies['react-bootstrap-hoc-error'] = '^0.0.1';
+      pkg.dependencies['react-bootstrap-hoc-error'] = '^0.1.1';
     }
     if (this.props.reduxloaderror) {
       pkg.dependencies['redux-load-error'] = '^1.0.2';
@@ -188,5 +183,14 @@ module.exports = class extends ReactReduxGenerator {
     let gitignore = this.fs.read(this.destinationPath('.gitignore'));
     gitignore += 'dist/*\n';
     this.fs.write(this.destinationPath('.gitignore'), gitignore);
+  }
+  end() {
+    if (this.props.reacthocloading) {
+      this.log(
+        `Dont forget to set your ${chalk.yellow(
+          'default LoadingComponent'
+        )}: https://github.com/MarcoScabbiolo/react-hoc-loading#set-a-default-loadingcomponent-globally-with-setdefaultloadingcomponent`
+      );
+    }
   }
 };

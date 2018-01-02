@@ -23,7 +23,7 @@ function testSuite(
     },
     options: {
       reacthocloading: false,
-      reactbootstraperror: false
+      reactbootstraphocerror: false
     }
   },
   testEnvironment = false
@@ -111,7 +111,7 @@ function testSuite(
     testUtils.testFileContentsByProp({
       testTrue: 'imports react-bootstrap-hoc-error',
       testFalse: 'does not import react-bootstrap-hoc-error',
-      prop: generator.props.reactbootstraperror,
+      prop: generator.props.reactbootstraphocerror,
       file: generator._componentToCreateFilePath,
       content: `import errorable from 'react-bootstrap-hoc-error';`
     });
@@ -119,7 +119,7 @@ function testSuite(
     testUtils.testFileContentsByProp({
       testTrue: 'adds the errorable decorator',
       testFalse: 'does not add the errorable decorator',
-      prop: generator.props.reactbootstraperror,
+      prop: generator.props.reactbootstraphocerror,
       file: generator._componentToCreateFilePath,
       content: `@errorable()`
     });

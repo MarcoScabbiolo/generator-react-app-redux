@@ -42,7 +42,7 @@ function testSuite(
       sections: false,
       entities: false,
       reacthocloading: false,
-      reactbootstraperror: false,
+      reactbootstraphocerror: false,
       reduxloaderror: false
     }
   },
@@ -152,8 +152,9 @@ function testSuite(
         path: generator.props.name,
         type: generator.props.sections ? 'section' : 'simple',
         stylesheet: true,
-        reacthocloading: generator.props.reacthocloading,
-        reactbootstraperror: generator.props.reactbootstraperror,
+        reacthocloading: generator.props.sections && generator.props.reacthocloading,
+        reactbootstraphocerror:
+          generator.props.sections && generator.props.reactbootstraphocerror,
         componentname: generator.props.name
       }
     });

@@ -11,6 +11,22 @@ component({
   },
   options: {
     bootstrap: true,
-    reacthocloading: false
+    reacthocloading: false,
+    reactbootstraphocerror: false
+  }
+});
+
+component({
+  runGenerator: true,
+  prompts: {
+    name: 'test',
+    path: 'generator_tests',
+    type: 'section',
+    container: false
+  },
+  options: {
+    bootstrap: true,
+    reacthocloading: true,
+    reactbootstraphocerror: true
   }
 });

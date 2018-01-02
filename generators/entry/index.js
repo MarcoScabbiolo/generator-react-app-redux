@@ -74,8 +74,6 @@ module.exports = class extends environment(ReactReduxGenerator) {
         this.composeWith(require.resolve('../reducer'), {
           name: this.props.name,
           path: this.props.path,
-          reacthocloading: this.props.reacthocloading,
-          reactboostraphocerror: this.props.reactboostraphocerror,
           type: 'section',
           reduxloaderror: this.props.reduxloaderror,
           actions: this._relatedActions,
@@ -92,7 +90,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
         stylesheet: true,
         logScaffoldingPath: false,
         reacthocloading: this.props.sections && this.props.reacthocloading,
-        reactboostraphocerror: this.props.sections && this.props.reactboostraphocerror,
+        reactbootstraphocerror: this.props.sections && this.props.reactbootstraphocerror,
         type: this.props.sections ? 'section' : 'standard'
       });
     });

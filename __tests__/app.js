@@ -112,7 +112,7 @@ describe('generator-react-app-redux:app', () => {
       sections: true,
       entities: true,
       reacthocloading: true,
-      reactbootstraperror: true,
+      reactbootstraphocerror: true,
       reduxloaderror: true
     },
     prompts: {}
@@ -185,7 +185,7 @@ describe('generator-react-app-redux:app:2', () => {
       path: '',
       skipEntryDirectory: true,
       reacthocloading: false,
-      reactbootstraperror: false,
+      reactbootstraphocerror: false,
       reduxloaderror: false,
       sections: false,
       entities: false

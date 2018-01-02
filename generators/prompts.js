@@ -58,7 +58,7 @@ const prompts = [
     name: 'reduxloaderror',
     type: 'confirm',
     default: false,
-    sotre: true,
+    store: true,
     when: props =>
       !_.isBoolean(props.reduxloaderror) && _.isBoolean(props.sections) && props.sections,
     order: 4
