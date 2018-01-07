@@ -5,6 +5,7 @@ import './app.scss';
 class App extends PureComponent {
   static propTypes = {
     initialized: PropTypes.bool.isRequired,
+    children: PropTypes.element,
     onInitialize: PropTypes.func.isRequired
   };
   componentDidMount() {
