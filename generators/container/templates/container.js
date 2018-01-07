@@ -2,10 +2,10 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 export default connect(
-  (state, ownProps) => ({
+  state => ({
 
   }),
-  (dispatch, ownProps) => bindActionCreators({
+  dispatch => bindActionCreators({
 
   }, dispatch)
 )();

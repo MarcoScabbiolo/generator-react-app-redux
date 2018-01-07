@@ -5,7 +5,11 @@ import App from 'components/App';
 
 export default connect(
   state => state.app,
-  dispatch => bindActionCreators({
-    onInitialize: app.initialize,
-  }, dispatch)
+  dispatch =>
+    bindActionCreators(
+      {
+        onInitialize: app.initialize
+      },
+      dispatch
+    )
 )(App);
