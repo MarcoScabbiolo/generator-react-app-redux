@@ -16,11 +16,15 @@ The main app generator is working, the others need work. Any [contributions][con
 
 Optionally
 
+- Seperate reducers for every mayor UI component into its own `section`
+- Separate reducer for entities
 - [Bootstrap 3][react-bootstrap] ported to React
 - [Thunks][redux-thunk]
 - Data normalization with [normalizr][normalizr]
 - [Redux form][redux-form]
 - [HOC to set React components to be loading][react-hoc-loading]
+- [HOC to set React components to have an error][react-bootstrap-hoc-error]
+- [Pre-Reducer for mayor UI components that can be loading or have an error][redux-load-error]
 - [Webpack Dashboard][webpack-dashboard]
 
 ## Install
@@ -69,4 +73,6 @@ If there's something you don't like about the generated proyect [please share yo
 [redux-form]: https://redux-form.com/7.1.2/
 [normalizr]: https://github.com/paularmstrong/normalizr#normalizr----
 [react-hoc-loading]: https://github.com/MarcoScabbiolo/react-hoc-loading
+[react-bootstrap-hoc-error]: https://github.com/MarcoScabbiolo/react-bootstrap-hoc-error
+[redux-load-error]: https://github.com/MarcoScabbiolo/redux-load-error
 [webpack-dashboard]: https://github.com/FormidableLabs/webpack-dashboard#webpack-dashboard
