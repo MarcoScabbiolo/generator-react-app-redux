@@ -111,6 +111,13 @@ const baseWebpackConfiguration = {
         options: {
           name: 'assets/fonts/[name].[ext]'
         }
+      },
+      {
+        test: /\.(jpg|png|gif)$/,
+        loader: 'file-loader',
+        options: {
+          name: 'assets/images/[name].[ext]'
+        }
       }
     ]
   },
