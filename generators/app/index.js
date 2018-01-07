@@ -163,14 +163,6 @@ module.exports = class extends ReactReduxGenerator {
       pkg.dependencies['redux-load-error'] = '^1.0.2';
     }
 
-    pkg.eslintConfig = {
-      parser: 'babel-eslint',
-      extends: ['plugin:react/recommended'],
-      env: {
-        browser: true
-      }
-    };
-
     this.fs.writeJSON(this.destinationPath('package.json'), pkg);
 
     let webpack = this.fs.readJSON(this.templatePath('webpack-config.json'), {});
@@ -184,6 +176,10 @@ module.exports = class extends ReactReduxGenerator {
     this.fs.write(this.destinationPath('.gitignore'), gitignore);
   }
   end() {
+    let pkg = this.fs.readJSON(this.destinationPath('package.json'));
+    pkg.eslintConfig.extends.push('plugin:react/recommended');
+    this.fs.writeJSON(this.destinationPath('package.json'), pkg);
+
     if (this.props.reacthocloading) {
       this.log(
         `Dont forget to set your ${chalk.yellow(

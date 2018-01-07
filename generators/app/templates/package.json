@@ -36,5 +36,12 @@
     "autoprefixer": "^7.1.6",
     "uglifyjs-webpack-plugin": "^1.1.0",
     "webpack-cleanup-plugin": "^0.5.1"
+  },
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "extends": ["plugin:react/recommended"],
+    "env": {
+      "browser": true
+    }
   }
 }

@@ -96,6 +96,18 @@ describe('generator-react-app-redux:app', () => {
         expect(webpack.defaultTemplate).to.equal('ejs');
         expect(webpack.dashboard).to.equal(true);
       }));
+
+    test('eslint config', () => {
+      assert.jsonFileContent('package.json', {
+        eslintConfig: {
+          parser: 'babel-eslint',
+          extends: ['xo', 'prettier', 'plugin:react/recommended'],
+          env: {
+            browser: true
+          }
+        }
+      });
+    });
   });
 
   entry({
