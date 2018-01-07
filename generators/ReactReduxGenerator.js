@@ -22,10 +22,6 @@ module.exports = class extends reactReduxEnvironment(Generator) {
 
     this.reactReduxGeneratorOptions = reactReduxGeneratorOptions;
 
-    if (!this.reactReduxGeneratorOptions.prompts) {
-      this.reactReduxGeneratorOptions.prompts = [];
-    }
-
     sharedOptions.include(
       this.option.bind(this),
       reactReduxGeneratorOptions.shared,

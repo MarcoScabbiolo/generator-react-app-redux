@@ -7,13 +7,12 @@ component({
     name: 'test',
     path: 'generator_tests',
     type: 'section',
-    container: false
-  },
-  options: {
+    container: false,
     bootstrap: true,
     reacthocloading: false,
     reactbootstraphocerror: false
-  }
+  },
+  options: {}
 });
 
 component({
@@ -22,11 +21,10 @@ component({
     name: 'test',
     path: 'generator_tests',
     type: 'section',
-    container: false
-  },
-  options: {
+    container: false,
     bootstrap: true,
     reacthocloading: true,
     reactbootstraphocerror: true
-  }
+  },
+  options: {}
 });

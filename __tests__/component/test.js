@@ -19,12 +19,11 @@ function testSuite(
       path: 'generator_tests',
       container: true,
       bootstrap: true,
-      stylesheet: false
-    },
-    options: {
+      stylesheet: false,
       reacthocloading: false,
       reactbootstraphocerror: false
-    }
+    },
+    options: {}
   },
   testEnvironment = false
 ) {
