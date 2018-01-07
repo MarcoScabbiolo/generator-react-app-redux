@@ -112,7 +112,6 @@ module.exports = class extends ReactReduxGenerator {
     let component = astUtils.parse(this.fs.read(this.templatePath('component.js')));
 
     if (this.props.bootstrap) {
-      component = astUtils.importBootstrap(component);
       component = astUtils.newImport(
         component,
         types.importDeclaration(

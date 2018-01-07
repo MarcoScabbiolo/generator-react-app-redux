@@ -3,8 +3,24 @@ const generator = require('babel-generator');
 const prettier = require('prettier');
 const babylon = require('babylon');
 const types = require('babel-types');
+const traverse = require('@babel/traverse');
 const assert = require('chai').assert;
 const pkg = require('../package.json');
+
+function pushLinesDown(ast, from) {
+  traverse.default(ast, {
+    enter(path) {
+      if (
+        path.parent.type === 'Program' &&
+        path.node.loc &&
+        path.node.loc.start.line >= from
+      ) {
+        path.node.loc.start.line += 1;
+        path.node.loc.end.line += 1;
+      }
+    }
+  });
+}
 
 function shorthandProperty(name) {
   return types.objectProperty(
@@ -39,11 +55,46 @@ function singleSpecifierImportDeclaration(
 }
 
 function lastImportIndex(ast) {
-  return _.findLastIndex(ast.body, types.isImportDeclaration) + 1;
+  return _.findLastIndex(ast.program.body, types.isImportDeclaration) + 1;
 }
 
 function newImport(ast, importDeclaration) {
-  ast.program.body.splice(lastImportIndex(ast), 0, importDeclaration);
+  let lastIndex = lastImportIndex(ast);
+  let line = ast.program.body[lastIndex - 1]
+    ? ast.program.body[lastIndex - 1].loc.start.line + 1
+    : 1;
+  importDeclaration.loc = {
+    start: { line, column: 0 },
+    end: { line }
+  };
+  pushLinesDown(ast, line);
+  ast.program.body.splice(lastIndex, 0, importDeclaration);
+  return ast;
+}
+
+function newBodyStatement(ast, statement, line, index) {
+  statement.loc = {
+    start: { line, column: 0 },
+    end: { line }
+  };
+  ast.program.body.splice(index, 0, statement);
+  return ast;
+}
+
+function newBodyStatements(ast, statements, startingLine, startingIndex) {
+  for (let i = 0; i < statements.length; i += 1) {
+    pushLinesDown(ast, startingLine);
+  }
+
+  let currentIndex = startingIndex;
+
+  statements.forEach((stmt, i) => {
+    if (stmt) {
+      newBodyStatement(ast, stmt, startingLine + i, currentIndex);
+      currentIndex += 1;
+    }
+  });
+
   return ast;
 }
 
@@ -80,7 +131,7 @@ function findReturnStatement(body) {
 
 function generate(ast) {
   return prettier.format(
-    generator.default(ast, { quotes: 'single' }).code,
+    generator.default(ast, { quotes: 'single', retainLines: true }).code,
     pkg.eslintConfig.rules['prettier/prettier'][1]
   );
 }
@@ -127,7 +178,10 @@ module.exports = {
   findReturnStatement,
   lastImportIndex,
   newImport,
+  newBodyStatement,
+  newBodyStatements,
   shorthandProperty,
   importBootstrap,
-  importAll
+  importAll,
+  pushLinesDown
 };

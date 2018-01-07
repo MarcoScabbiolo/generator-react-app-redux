@@ -28,12 +28,13 @@ function testSuite(
     }
   },
   testEnvironment = false,
-  inTmpDir = () => null
+  inTmpDir = () => null,
+  skip = false
 ) {
   var generator = new (environment(reactReduxEnvironment()))();
   generator.forceConfiguration(options.options, options.prompts);
 
-  describe('generator-react-app-redux:reducer', () => {
+  (skip ? describe.skip : describe)('generator-react-app-redux:reducer', () => {
     if (testEnvironment) {
       describe('environment', () => {
         test('returns', () => {
@@ -76,9 +77,9 @@ function testSuite(
       test('combines all the reducers', () => {
         assert.fileContent(
           generator._reducerToCreateFilePath,
-          'const reducer = combineReducers({\n  ' +
-            _.keys(generator.props.reducers).join(',\n  ') +
-            '\n});'
+          'const reducer = combineReducers({ ' +
+            _.keys(generator.props.reducers).join(', ') +
+            ' });'
         );
       });
     } else {

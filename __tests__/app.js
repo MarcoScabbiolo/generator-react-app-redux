@@ -18,7 +18,6 @@ const assertBabelrc = babelrc =>
 const assertAppComponentBootstrapFileContents = (includes = true) => {
   let assertComponent = includes ? assert.fileContent : assert.noFileContent;
   return function() {
-    assertComponent('src/components/App.js', "import * as B from 'react-bootstrap';");
     assertComponent(
       'src/components/App.js',
       "import '../../node_modules/bootstrap/dist/css/bootstrap.css';"

@@ -136,10 +136,19 @@ module.exports = class extends environment(ReactReduxGenerator) {
         );
 
         // Add action arrays
-        ast.program.body.unshift(
-          this._emptyActionsArrayConstDeclaration('loadingActions'),
-          this._emptyActionsArrayConstDeclaration('notLoadingActions'),
-          this._emptyActionsArrayConstDeclaration('errorActions')
+        let lastImportIndex = astUtils.lastImportIndex(ast);
+
+        astUtils.newBodyStatements(
+          ast,
+          [
+            undefined,
+            this._emptyActionsArrayConstDeclaration('loadingActions'),
+            this._emptyActionsArrayConstDeclaration('notLoadingActions'),
+            this._emptyActionsArrayConstDeclaration('errorActions'),
+            undefined
+          ],
+          lastImportIndex + 1,
+          lastImportIndex
         );
 
         // Add loading: false in the initialState
