@@ -1,8 +1,10 @@
 import { createStore, applyMiddleware, compose  } from 'redux';
 
-const middleware = [
-  window.devToolsExtension && window.devToolsExtension(),
-];
+const middleware = [applyMiddleware(thunk)];
+
+if (window.devToolsExtension) {
+  middleware.push(window.devToolsExtension());
+}
 
 function reduxStore(initialState) {
   const store = createStore(mainReducer, initialState,
