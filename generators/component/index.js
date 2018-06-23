@@ -4,12 +4,16 @@ const _ = require('lodash');
 const types = require('babel-types');
 const astUtils = require('../astUtils');
 const environment = require('./Environment');
+const isValidIdentifier = require('is-var-name');
 
 const shared = ['path', 'bootstrap', 'reacthocloading', 'reactbootstraphocerror'];
 const prompts = [
   {
     name: 'name',
     message: 'What will be the name of the new component?',
+    validate: name =>
+      isValidIdentifier(name) ||
+      `${name} is not a valid identifier, it cannot be used as the name of the component`,
     when: props => !props.name
   },
   {
@@ -46,6 +50,14 @@ const prompts = [
     default: false,
     message: 'Do you want to include a stylesheet for this component?',
     when: props => !_.isBoolean(props.stylesheet)
+  },
+  {
+    name: 'reducer',
+    type: 'confirm',
+    default: true,
+    message: 'Do you want to include a reducer for this section?',
+    when: props => !_.isBoolean(props.reducer) && props.type === 'section',
+    order: 2
   }
 ];
 
@@ -101,10 +113,23 @@ module.exports = class extends environment(ReactReduxGenerator) {
     );
   }
   initializing() {
+    this.props.sections = this.config.get('sections');
     return this._initializing();
   }
   prompting() {
-    return this._prompting();
+    if (!this.props.sections) {
+      this.reactReduxGeneratorOptions.prompts
+        .find(p => p.name === 'type')
+        .choices.splice(2, 1);
+    }
+    return this._prompting().then(() => {
+      this.composeWith(require.resolve('../reducer'), {
+        name: this.props.name,
+        path: this.props.path,
+        type: 'section',
+        sectionReducerFilePath: this._resolveSectionsReducerFilePath(this.props.path)
+      });
+    });
   }
   writing() {
     let ast = astUtils.parse(this._templateByTypeContents);

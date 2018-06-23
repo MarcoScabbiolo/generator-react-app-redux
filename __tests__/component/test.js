@@ -6,6 +6,7 @@ const environment = require('../../generators/component/Environment');
 const testUtils = require('../_utils/testUtils');
 const chai = require('chai');
 const container = require('../container/test');
+const reducer = require('../reducer/test');
 const _ = require('lodash');
 
 const [envMain, envFoo] = testUtils.testEnvironment(environment, { type: 'section' });
@@ -21,11 +22,13 @@ function testSuite(
       bootstrap: true,
       stylesheet: false,
       reacthocloading: false,
-      reactbootstraphocerror: false
+      reactbootstraphocerror: false,
+      reducer: false
     },
     options: {}
   },
-  testEnvironment = false
+  testEnvironment = false,
+  fixture = () => null
 ) {
   var generator = new (environment(reactReduxEnvironment()))();
   generator.forceConfiguration(options.options, options.prompts);
@@ -63,7 +66,8 @@ function testSuite(
         helpers
           .run(path.join(__dirname, '../../generators/component'))
           .withOptions(options.options)
-          .withPrompts(options.prompts));
+          .withPrompts(options.prompts)
+          .inTmpDir(fixture));
     }
 
     test('creates files', () => {
@@ -135,6 +139,20 @@ function testSuite(
         name: generator.props.name,
         path: generator.props.path,
         component: generator._componentToCreateFilePath
+      }
+    });
+  }
+
+  if (generator.props.reducer) {
+    reducer({
+      runGenerator: false,
+      options: {
+        name: generator.props.name,
+        path: generator.props.path,
+        type: 'section',
+        sectionReducerFilePath: generator._resolveSectionsReducerFilePath(
+          generator.props.path
+        )
       }
     });
   }

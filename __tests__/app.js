@@ -124,7 +124,8 @@ describe('generator-react-app-redux:app', () => {
       entities: true,
       reacthocloading: true,
       reactbootstraphocerror: true,
-      reduxloaderror: true
+      reduxloaderror: true,
+      reducer: false
     },
     prompts: {}
   });
@@ -199,7 +200,8 @@ describe('generator-react-app-redux:app:2', () => {
       reactbootstraphocerror: false,
       reduxloaderror: false,
       sections: false,
-      entities: false
+      entities: false,
+      reducer: false
     },
     prompts: {}
   });

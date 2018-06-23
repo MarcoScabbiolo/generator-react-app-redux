@@ -37,7 +37,11 @@ function testSuite(
     test('creates files', () => {
       assert.file(
         [generator._rootReducerFilePath, generator._storeFilePath]
-          .concat(generator.props.sections ? [generator._sectionsReducerFilePath] : [])
+          .concat(
+            generator.props.sections
+              ? [generator._resolveSectionsReducerFilePath(generator.props.name)]
+              : []
+          )
           .concat(generator.props.entities ? [generator._entitiesReducerFilePath] : [])
       );
     });

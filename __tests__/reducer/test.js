@@ -42,9 +42,9 @@ function testSuite(
         });
 
         test('reducer to create path', () => {
-          envMain()._reducerToCreatePath.should.equal('reducers/main/sections/main');
+          envMain()._reducerToCreatePath.should.equal('reducers/sections/main');
           envMain()._reducerToCreateFilePath.should.equal(
-            'src/reducers/main/sections/main.js'
+            'src/reducers/sections/main.js'
           );
           envFoo()._reducerToCreatePath.should.equal('reducers/foo/bar');
           envFoo()._reducerToCreateFilePath.should.equal('src/reducers/foo/bar.js');

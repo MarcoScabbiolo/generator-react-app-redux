@@ -48,20 +48,18 @@ describe('react-redux environment', () => {
   });
 
   test('sections reducer path', () => {
-    index()._sectionsReducerPath.should.equal('reducers/index/sections');
-    index()._sectionsReducerFilePath.should.equal('src/reducers/index/sections.js');
-    foo()._sectionsReducerPath.should.equal('reducers/foo/bar/sections');
-    foo()._sectionsReducerFilePath.should.equal('src/reducers/foo/bar/sections.js');
+    index()._sectionsReducerPath.should.equal('reducers/sections');
+    index()._sectionsReducerFilePath.should.equal('src/reducers/sections.js');
+    foo()._sectionsReducerPath.should.equal('reducers/foo/sections');
+    foo()._sectionsReducerFilePath.should.equal('src/reducers/foo/sections.js');
   });
 
   test('default section reducer path', () => {
-    index()._defaultSectionReducerPath.should.equal('reducers/index/sections');
-    index()._defaultSectionReducerFilePath.should.equal(
-      'src/reducers/index/sections/index.js'
-    );
-    foo()._defaultSectionReducerPath.should.equal('reducers/foo/bar/sections');
+    index()._defaultSectionReducerPath.should.equal('reducers/sections');
+    index()._defaultSectionReducerFilePath.should.equal('src/reducers/sections/index.js');
+    foo()._defaultSectionReducerPath.should.equal('reducers/foo/sections');
     foo()._defaultSectionReducerFilePath.should.equal(
-      'src/reducers/foo/bar/sections/index.js'
+      'src/reducers/foo/sections/index.js'
     );
   });
 
@@ -90,22 +88,22 @@ describe('react-redux environment', () => {
   test('resolve section reducer path', () => {
     index()
       ._sectionReducersPath('asection')
-      .should.equal('reducers/index/sections/asection');
+      .should.equal('reducers/sections/asection');
     index()
       ._sectionReducersDirectoryPath('asection')
-      .should.equal('src/reducers/index/sections/asection');
+      .should.equal('src/reducers/sections/asection');
     index()
       ._sectionReducersFilePath('asection')
-      .should.equal('src/reducers/index/sections/asection.js');
+      .should.equal('src/reducers/sections/asection.js');
     foo()
       ._sectionReducersPath('asection')
-      .should.equal('reducers/foo/bar/sections/asection');
+      .should.equal('reducers/foo/sections/asection');
     foo()
       ._sectionReducersDirectoryPath('asection')
-      .should.equal('src/reducers/foo/bar/sections/asection');
+      .should.equal('src/reducers/foo/sections/asection');
     foo()
       ._sectionReducersFilePath('asection')
-      .should.equal('src/reducers/foo/bar/sections/asection.js');
+      .should.equal('src/reducers/foo/sections/asection.js');
   });
 
   test('resolve component path', () => {

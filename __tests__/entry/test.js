@@ -138,7 +138,10 @@ function testSuite(
           path: generator.props.path,
           type: 'section',
           actions: generator._relatedActions,
-          reactloaderror: generator.props.reactloaderror
+          reactloaderror: generator.props.reactloaderror,
+          sectionReducerFilePath: generator._resolveSectionsReducerFilePath(
+            generator.props.name
+          )
         },
         prompts: {}
       });

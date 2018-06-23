@@ -64,9 +64,7 @@ module.exports = class extends ReactReduxGenerator {
   prompting() {
     return this._prompting().then(() => {
       this.config.set({
-        bootstrapEnabled: this.props.bootstrap,
-        thunkEnabled: this.props.thunk,
-        formsEnabled: this.props.form
+        sections: this.props.sections
       });
       this.config.save();
 
@@ -176,6 +174,7 @@ module.exports = class extends ReactReduxGenerator {
     this.fs.write(this.destinationPath('.gitignore'), gitignore);
   }
   end() {
+    this.conflicter.force = true;
     let pkg = this.fs.readJSON(this.destinationPath('package.json'));
     pkg.eslintConfig.extends.push('plugin:react/recommended');
     this.fs.writeJSON(this.destinationPath('package.json'), pkg);

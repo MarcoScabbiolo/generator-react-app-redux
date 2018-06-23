@@ -4,6 +4,7 @@ const _ = require('lodash');
 const astUtils = require('../astUtils');
 const environment = require('./Environment');
 const types = require('babel-types');
+const chalk = require('chalk');
 
 const shared = ['path', 'reduxloaderror'];
 const prompts = [
@@ -79,6 +80,13 @@ module.exports = class extends environment(ReactReduxGenerator) {
   }
   _addSection() {
     let destinationPath = this.destinationPath(this._secionsReducerToCombineWithFilePath);
+    if (!this.fs.exists(destinationPath)) {
+      this.log(chalk.red("Couldn't add reducer to sections reducer composition"));
+      this.log(
+        'Sections reducer could not be found at: ' + chalk.yellow(destinationPath)
+      );
+      return;
+    }
     let ast = astUtils.parse(this.fs.read(destinationPath));
 
     ast = astUtils.newImport(

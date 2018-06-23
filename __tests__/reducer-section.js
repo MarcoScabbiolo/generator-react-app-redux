@@ -47,7 +47,7 @@ describe('generator-react-app-redux:reducer-section code formatting', () => {
 
   test('proper formatting', () => {
     assert.fileContent(
-      'src/reducers/test/sections/test.js',
+      'src/reducers/sections/test.js',
       `import loadErrorPreReducer from 'redux-load-error';
 
 const loadingActions = [];

@@ -184,7 +184,7 @@ module.exports = class extends ReactReduxGenerator {
       // Copy sections reducer
       this.fs.copy(
         this.templatePath('static/sections.js'),
-        this.destinationPath(this._sectionsReducerFilePath)
+        this.destinationPath(this._resolveSectionsReducerFilePath(this.props.name))
       );
     }
 

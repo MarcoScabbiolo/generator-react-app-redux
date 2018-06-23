@@ -77,6 +77,7 @@ module.exports = class extends environment(ReactReduxGenerator) {
           type: 'section',
           reduxloaderror: this.props.reduxloaderror,
           actions: this._relatedActions,
+          sectionReducerFilePath: this._resolveSectionsReducerFilePath(this.props.name),
           logScaffoldingPath: false
         });
       }
@@ -91,7 +92,8 @@ module.exports = class extends environment(ReactReduxGenerator) {
         logScaffoldingPath: false,
         reacthocloading: this.props.sections && this.props.reacthocloading,
         reactbootstraphocerror: this.props.sections && this.props.reactbootstraphocerror,
-        type: this.props.sections ? 'section' : 'standard'
+        type: this.props.sections ? 'section' : 'standard',
+        reducer: false
       });
     });
   }

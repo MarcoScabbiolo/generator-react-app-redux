@@ -19,7 +19,7 @@ const prompts = [
   },
   {
     name: 'path',
-    message: 'Where do you want to place it? Insert a path relative to the src directory',
+    message: 'Where do you want to place it?',
     when: props => !_.isString(props.path)
   },
   {
@@ -37,7 +37,9 @@ const prompts = [
     default: false,
     store: true,
     when: props =>
-      !_.isBoolean(props.reacthocloading) && (!props.type || props.type === 'section'),
+      !_.isBoolean(props.reacthocloading) &&
+      (!props.type || props.type === 'section') &&
+      (!_.isBoolean(props.sections) || props.sections),
     order: 3
   },
   {
@@ -49,7 +51,9 @@ const prompts = [
     when: props =>
       !_.isBoolean(props.reactbootstraphocerror) &&
       _.isBoolean(props.bootstrap) &&
-      props.bootstrap,
+      props.bootstrap &&
+      (!props.type || props.type === 'section') &&
+      (!_.isBoolean(props.sections) || props.sections),
     order: 3
   },
   {
